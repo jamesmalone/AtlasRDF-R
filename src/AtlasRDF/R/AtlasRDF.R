@@ -1,0 +1,874 @@
+library(SPARQL)
+library(hash)
+
+
+
+
+
+
+###################
+#functions to perform querying of Atlas data
+###################
+
+
+#######
+#get all ensembl genes for an efo term for any species
+#######
+getAllEnsemblGenesForExFactor <- function(exfactor, limit = 0, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    limitC = ""
+    if (limit != 0)
+    if (is.numeric(limit) && ! is.null( grep ("/.",limit)))
+    limitC = paste( " limit " , limit)             
+    else
+    warning ("limit should be an integer, limit omitted from the query")
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getAllEnsemblGenesForExFactor \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?dbXref ?geneName ?ensemblid ?propertyValue \n",      
+            "WHERE { \n",           
+                "?expUri atlasterms:hasAnalysis ?analysis . \n",    
+                "?analysis atlasterms:hasExpressionValue ?value . \n",       
+                "?value atlasterms:hasFactorValue ?factor . \n",      
+                "?value atlasterms:isMeasurementOf ?probe . \n",     
+                "?probe atlasterms:dbXref ?dbXref . \n",
+                "?dbXref rdf:type <http://rdf.ebi.ac.uk/terms/atlas/EnsemblDatabaseReference> . \n",
+                "?dbXref rdfs:label ?geneName . \n",  
+                "?dbXref dcterms:identifier ?ensemblid . \n",    
+                "?factor atlasterms:propertyType ?propertyType . \n",       
+                "?factor atlasterms:propertyValue ?propertyValue . \n",
+                "?factor rdf:type " , exfactor , " .  \n",     
+                "}  \n",
+            limitC )
+    
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)    
+}
+
+
+##########
+#get all ensembl genes for an efo term for a specified species only
+##########
+getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    limitC = ""
+    if (limit != 0)
+    if (is.numeric(limit) && ! is.null( grep ("/.",limit)))
+    limitC = paste( " limit " , limit)             
+    else
+    warning ("limit should be an integer, limit omitted from the query")
+    
+    query <- paste( "#AtlasRDF-R query \n",
+            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT DISTINCT ?dbXref ?geneName ?ensemblid \n",      
+            "WHERE { \n",           
+                "?expUri atlasterms:hasAnalysis ?analysis . \n",    
+                "?analysis atlasterms:hasExpressionValue ?value . \n",       
+                "?value atlasterms:hasFactorValue ?factor . \n",      
+                "?value atlasterms:isMeasurementOf ?probe . \n",     
+                "?probe atlasterms:dbXref ?dbXref . \n",
+                "?dbXref rdf:type <http://rdf.ebi.ac.uk/terms/atlas/EnsemblDatabaseReference> . \n",
+                "?dbXref rdfs:label ?geneName . \n",  
+                "?dbXref dcterms:identifier ?ensemblid . \n",
+                "?dbXref atlasterms:taxon" , taxon , ". \n",    
+                "?factor atlasterms:propertyType ?propertyType . \n",       
+                "?factor atlasterms:propertyValue ?propertyValue . \n",
+                "?factor rdf:type" , exfactor , " .  \n",     
+                "}  \n",
+            limitC )
+    
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)    
+}
+
+
+
+########
+#get experiments where sample description contain specified term
+########
+getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    limitC = ""
+    if (limit != 0)
+    if (is.numeric(limit) && ! is.null( grep ("/.",limit)))
+    limitC = paste( " limit " , limit)             
+    else
+    warning ("limit should be an integer, limit omitted from the query")
+    
+    query <- paste( "#AtlasRDF-R query \n",
+            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT DISTINCT ?experiment ?description WHERE \n", 
+            "{?experiment a atlasterms:Experiment ; dcterms:description ?description ; \n", 
+                "atlasterms:hasAssay \n", 
+                "[atlasterms:hasSample \n", 
+                        "[atlasterms:hasSampleCharacteristic \n", 
+                                "[ atlasterms:propertyType ?propertyType ; atlasterms:propertyValue ?propertyValue] ] ] \n", 
+                "filter regex (?description, \"",searchterm,"\") \n", 
+                "}\n", 
+            limitC, sep="")
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)    
+}
+
+
+########
+#get all genes for given experiment, expeirment should be sent in form of experiment ID e.g. E-GEOD-1085
+########
+getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    experimenturi <- paste("atlas:",experiment, sep="")
+    
+    query <- paste( "#AtlasRDF-R query \n",
+            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?expressionValue ?dbXref ?pvalue ?propertyValue \n",       
+            "WHERE {\n",           
+                experimenturi,"atlasterms:hasAnalysis ?analysis . \n",    
+                "?analysis atlasterms:hasExpressionValue ?value . \n",           
+                "?value rdfs:label ?expressionValue . \n",     
+                "?value atlasterms:pValue ?pvalue . \n",      
+                "?value atlasterms:hasFactorValue ?factor . \n",      
+                "?value atlasterms:isMeasurementOf ?probe . \n",     
+                "?probe atlasterms:dbXref ?dbXref . \n",       
+                "?factor atlasterms:propertyType ?propertyType . \n",       
+                "?factor atlasterms:propertyValue ?propertyValue . \n",        
+                "}")
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)          
+}
+
+
+
+#########
+#get common name for any entity (if available), for example the common gene name 
+#requires input parameter of uri of entity in form <http://entityuri> NOTE: including angle brackets
+#########
+
+getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "#AtlasRDF-R query \n",
+            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?label{ \n",    
+                uri,"rdfs:label ?label . \n",
+                "}")
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)      
+}
+
+
+########
+#get the human readable label (if there is one) for any class in the data 
+#e.g. cancer for "efo:EFO_0000311"
+########
+getClassLabel <- function(classURI, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getClassLabel \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?name WHERE { \n",
+                classURI , " rdfs:label ?name . } \n" )
+    
+    labels <- SPARQL(url=endpoint, query)
+    return (labels$results)
+    
+}
+
+
+#########
+#query to get pathways associated 
+#########
+getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getClassLabel \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
+            
+            "SELECT distinct ?pathwayname ?expressionValue ?pvalue \n",
+            "WHERE { \n",
+                "?protein rdf:type biopax3:Protein . \n",
+                "?protein biopax3:memberPhysicalEntity \n",
+                "[biopax3:entityReference ?dbXref] . \n",
+                "?pathway rdf:type biopax3:Pathway . \n",
+                "?pathway biopax3:displayName ?pathwayname . \n",
+                "?pathway biopax3:pathwayComponent ?reaction . \n",
+                "?reaction rdf:type biopax3:BiochemicalReaction . \n",
+                "{ \n",
+                    "{?reaction ?rel ?protein .} \n",
+                    "UNION \n", 
+                    "{ \n", 
+                        "?reaction ?rel ?complex . \n",
+                        "?complex rdf:type biopax3:Complex . \n",
+                        "?complex ?comp ?protein . \n",
+                        "} \n", 
+                    "} \n", 
+                "?factor rdf:type ",condition," . \n",
+                "?value atlasterms:hasFactorValue ?factor . \n", 
+                "?value atlasterms:isMeasurementOf ?probe . \n",
+                "?value atlasterms:pValue ?pvalue . \n",
+                "?value rdfs:label ?expressionValue . \n",
+                "?probe atlasterms:dbXref ?dbXref . \n",
+                "} \n",
+            "ORDER BY ASC (?pvalue) ")
+    
+    pathways <- SPARQL(url=endpoint, query)
+    return (pathways$results)
+    
+}
+
+
+
+##########
+#
+##########
+drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    experiment <- paste("atlas:",experimentid, sep="")
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getClassLabel \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            
+            "SELECT DISTINCT ?genename ?factorLabel ?tStat WHERE { \n",
+                experiment,"atlasterms:hasAnalysis ?analysis . \n",     
+                "?analysis atlasterms:hasExpressionValue ?value . \n",
+                "?value atlasterms:pValue ?pvalue . \n",      
+                "?value atlasterms:tStatistic ?tStat . \n",      
+                "?value atlasterms:hasFactorValue ?factor . \n",
+                "?factor atlasterms:propertyValue ?factorLabel . \n",
+                "?value atlasterms:isMeasurementOf ?probe . \n",   
+                "?probe atlasterms:dbXref ?dbXref . \n",
+                "?dbXref rdfs:label ?genename . \n",
+                "} ORDER BY ?genename limit 10000")
+    
+    message("Executing query... please wait")
+    d <- SPARQL(url=endpoint, query)
+    
+    df <- data.frame(Genename=d$results$genename, Factor=factor(d$results$factorLabel), TStat=d$results$tStat, stringsAsFactors=FALSE)
+    attach(df)
+    genes <- unique(Genename)
+    
+    # create the matrix for the results and set the row and col names
+    values <- matrix(0, nrow=length(genes), ncol=length(unique(Factor)))
+    rownames(values) <- genes
+    colnames(values) <- unique(Factor)
+    
+    i<-1
+    while (i <= length(Genename)) {
+        
+        if((df$TStat[i] >= tstatsignificance) || (df$TStat[i] <= (-1*tstatsignificance))){
+        
+            gn <-df$Genename[i]
+            var <-df$Factor[i]
+            tstat <-df$TStat[i]
+
+        
+            rowindex <- match(gn, rownames(values))
+            colindex <- match(var, unique(Factor))
+            values[rowindex,colindex] <- tstat
+        }
+
+        i<-i+1
+    }
+    #fix this
+    values<-values[-which(rowSums(values==0) > 5),]
+    #stats::heatmap(values, scale="none", col = cm.colors(256))
+
+    par(oma=c(6,2,2,2))
+    heatmap(values, scale="none", col = cm.colors(256))
+
+    return(values)
+}
+
+
+
+#########
+#get mappings from NCBO for an efo term
+#########
+
+
+
+
+###################
+#functions to perform enrichment analysis
+###################
+
+
+###########
+#get gene uris given ensembl gene name and a taxon
+###########
+getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getClassLabel \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?geneuri WHERE { \n",
+                "?geneuri rdf:type atlasterms:EnsemblDatabaseReference . \n",
+                "?geneuri atlasterms:taxon ", taxon , ". \n",
+                "?geneuri rdfs:label ?label. \n", 
+                "FILTER regex(str(?label), \"^",genename,"$\"). \n", 
+                "}", sep="")
+    
+    uris <- SPARQL(url=endpoint, query)
+    return (uris$results)
+    
+}
+
+
+###########
+#get gene uris given ensembl gene id and a taxon
+###########
+getGeneUriFromEnsemblId <- function(id, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "#function: getClassLabel \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?geneuri WHERE { \n",
+                "?geneuri rdf:type atlasterms:EnsemblDatabaseReference . \n",
+                "?geneuri atlasterms:taxon ", taxon , ". \n",
+                "?geneuri dcterms:identifier ?geneid. \n", 
+                "FILTER regex(str(?geneid), \"",id,"\"). \n", 
+                "}", sep="")
+    
+    uris <- SPARQL(url=endpoint, query)
+    return (uris$results)
+    
+}
+
+
+#######
+#convenience function to get gene counts for the gene list in question
+#genelist should be a vector of gene uris which are being analysed for enrichment
+#######
+calculateCountsForGeneLists <- function(genelist, genelist_bg, genecounts){
+    
+    #import gene ref class
+    
+    generef <- setRefClass("generef",
+            fields = list( geneuri = "character",
+                    genelabel = "character",
+                    geneensemblid = "character",
+                    species = "character",
+                    exfactoruris="vector"),
+            
+            methods = list(
+                    setgeneuri = function(value) {
+                        geneuri <<- value
+                        invisible(value)
+                    },                
+                    getgeneuri = function() {
+                        return(geneuri)
+                    },                
+                    setgenelabel = function(value) {
+                        genelabel <<- value
+                        invisible(value)
+                    },
+                    getgenelabel = function() {
+                        return(genelabel)
+                    },
+                    setensemblid = function(value) {
+                        geneuri <<- value
+                        invisible(value)
+                    },                
+                    getensemblid = function() {
+                        return(geneuri)
+                    },  
+                    setspecies = function(value) {
+                        species <<- value
+                        invisible(value)
+                    },                
+                    getspecies = function() {
+                        return(species)
+                    },  
+                    getexfactoruris = function() {
+                        return(exfactoruris)
+                    },   
+                    #function to merge a passed parameter with the existing set of genes stored in this object
+                    mergeexfactoruris = function(value){
+                        if(!is.null(value)){
+                            exfactoruris <<-unique(c(exfactoruris, value))
+                        }                      
+                    }        
+                    ))
+    
+    
+    
+    #import the factor background class
+    factorbackground <- setRefClass("factorbackground",
+            fields = list( uri = "character",
+                    label = "character",
+                    species = "character",
+                    geneuris="vector",
+                    numgenesexpressed="integer", 
+                    numgenesnotexpressed="integer", 
+                    subclasses="vector", 
+                    superclasses="vector"),
+            
+            methods = list(
+                    seturi = function(value) {
+                        uri <<- value
+                        invisible(value)
+                    },
+                    
+                    geturi = function() {
+                        return(uri)
+                    },
+                    
+                    setlabel = function(value) {
+                        label <<- value
+                        invisible(value)
+                    },
+                    
+                    getlabel = function() {
+                        return(label)
+                    },
+                    
+                    setspecies = function(value) {
+                        species <<- value
+                        invisible(value)
+                    },
+                    
+                    getspecies = function() {
+                        return(species)
+                    },
+                    
+                    setgeneuris = function(value) {
+                        geneuris <<- value
+                        invisible(value)
+                    },
+                    
+                    getgeneuris = function() {
+                        return(geneuris)
+                    },
+                    
+                    setnumgenesexpressed = function(value) {
+                        numgenesexpressed <<- value
+                        invisible(value)
+                    },
+                    
+                    getnumgenesexpressed = function() {
+                        return(numgenesexpressed)
+                    },
+                    
+                    setnumgenesnotexpressed = function(value) {
+                        numgenesnotexpressed <<- value
+                        invisible(value)
+                    },
+                    
+                    getnumgenesnotexpressed = function() {
+                        return(numgenesnotexpressed)
+                    },
+                    
+                    setsubclasses = function(value) {
+                        subclasses <<- value
+                        invisible(value)
+                    },
+                    
+                    getsubclasses = function() {
+                        return(subclasses)
+                    },
+                    
+                    setsuperclasses = function(value) {
+                        superclasses <<- value
+                        invisible(value)
+                    },
+                    
+                    getsuperclasses = function() {
+                        return(superclasses)
+                    },
+                    
+                    #function to merge a passed parameter with the existing set of genes stored in this object
+                    mergegeneuris = function(value){
+                        if(!is.null(value)){
+                            geneuris <<-unique(c(geneuris, value))
+                        } 
+                    }
+                    
+                    ))
+    
+    #creat a hash to store the genelist's factors in (hash of factorbackground classes)
+    genelistfactors <- hash()
+    
+    #preprocess the genelist to check for multiple uris for a single gene - this needs to be flattened
+    processedgenelist <- vector()
+    for(i in 1:length(genelist)){   
+        if(length(genelist[[i]]) > 1){
+            for(j in 1:length(genelist[[i]])){
+                processedgenelist <- c(processedgenelist, genelist[[i]][j])
+            }
+        }
+        else{
+            processedgenelist <- c(processedgenelist, genelist[[i]])
+        }
+        
+    }
+    
+    #replace the gene list with the normalised flat gene list
+    genelist <- processedgenelist
+    #get total genes for this gene list 
+    totalnumbergenes <- length(genelist)
+    
+    #for each gene in gene list find the ex factors terms associated  
+    for(i in 1:length(genelist)){    
+        
+        geneobject <- genelist_bg[[genelist[[i]]]]
+        
+        #if the gene has been found in the background
+        if(!is.null(geneobject)){
+            message("Found gene ", genelist[[i]] )
+            #get the ex factors for this gene
+            singlegeneexfactors <- geneobject$exfactoruris
+            species <- geneobject$species
+            
+            #for each ex factor for this gene 
+            for(j in 1:length(singlegeneexfactors)){
+                #check to see if the factor exists already
+                if(has.key(singlegeneexfactors[j], genelistfactors) == TRUE){      
+                    #the ex factor is in the hash set already so merge gene into slot
+                    factorobject <- genelistfactors[[singlegeneexfactors[j]]]                  
+                    factorobject$mergegeneuris(genelist[[i]])
+                    numgenesex <- length(factorobject$getgeneuris())
+                    factorobject$setnumgenesexpressed(as.integer(numgenesex))
+                    factorobject$setnumgenesnotexpressed(as.integer(totalnumbergenes-numgenesex))
+                    factorobject$species <- species                    
+                    
+                    #add back to the hash set
+                    .set(genelistfactors, keys=singlegeneexfactors[j], values=factorobject)
+                }
+                #otherwise mint new object and add to hash
+                else{
+                    factorobject <- factorbackground$new()
+                    factorobject$seturi(singlegeneexfactors[j])
+                    factorobject$mergegeneuris(genelist[[i]])
+                    numgenesex <- length(factorobject$getgeneuris())
+                    factorobject$setnumgenesexpressed(as.integer(numgenesex))
+                    factorobject$setnumgenesnotexpressed(as.integer(totalnumbergenes-numgenesex))
+                    factorobject$species <- species
+                    
+                    #add new object to the hash set
+                    .set(genelistfactors, keys=singlegeneexfactors[j], values=factorobject)
+                    
+                }
+            }#end for             
+        }
+        else{
+            message("Did not find gene ", genelist[[i]] , ": ignoring")          
+        }
+    }
+    
+    return(genelistfactors)
+    
+}
+
+
+
+###############
+#function to do enrichment using Fishers exact test based on a set of genelistfactors (factors for genes) and bg counts
+#the input requires the gene list to be in the form of identifiers.org ensembl uris to turn common names into
+#uris use the function getEnsemblUrisFromNames
+###############
+doFishersEnrichment <- function(genelist, genelist_bg, genecounts){
+    
+    #calc counts for given gene list
+    genelistfactors <- calculateCountsForGeneLists(genelist, genelist_bg, genecounts)
+    
+    
+    #specify class to store enrichemt results 
+    enrichmentresult <- setClass("enrichmentresult",           
+            representation( factoruri="character", 
+                    label="character", 
+                    p.value="numeric", 
+                    estimate="numeric",    
+                    alternative="character", 
+                    null.value="numeric", 
+                    method="character",
+                    enrichedgenes="vector"))
+    
+    fisherresults <- list()
+    
+    #do test for each factor
+    genes <- keys(genelistfactors)
+    for (i in 1:length(genes)){
+        
+        genelistobject <- genelistfactors[[genes[i]]]
+        bggeneobject <- genecounts[[genes[i]]]
+        
+        if(!is.null(genelistobject) && !is.null(bggeneobject)){
+            
+            #gather stats for fisher test
+            genelistannotated <- genelistobject$numgenesexpressed
+            genelistnotannotated <- genelistobject$numgenesnotexpressed
+            bgannotated <- bggeneobject$numgenesexpressed
+            bgnotannotated <- bggeneobject$numgenesnotexpressed
+            
+            input <- matrix(c(genelistannotated, genelistnotannotated, bgannotated, bgnotannotated), nrow = 2, dimnames =
+                    list(c("Annotated", "Not Annotated"),
+                            c("Genelist", "Backgound")))
+            
+            #do fisher's exact test
+            result <- fisher.test(input)
+            
+            #store results
+            enrichresult <- new("enrichmentresult")
+            
+            enrichresult@label <- bggeneobject$label
+            enrichresult@factoruri <- genelistobject$uri
+            enrichresult@enrichedgenes <- genelistobject$geneuris
+            enrichresult@p.value <- result$p.value            
+            enrichresult@estimate <- result$estimate
+            enrichresult@alternative <- result$alternative
+            enrichresult@null.value <- result$null.value
+            enrichresult@method <- result$method
+            
+            fisherresults <- c(fisherresults, enrichresult)                        
+            
+        }
+        
+    }
+    message("enrichment complete")
+    return(fisherresults)
+    
+}
+
+
+
+
+###############
+#function to do enrichment analysis using Fisher's exact test based on a gene list specified by common gene name
+#input requires a vector of the common gene names and a taxon id e.g. obo:NCBITaxon_9606 for human (note genes from multiple species not allowed) 
+###############
+doFishersEnrichmentForGeneNames <- function(genenames, taxon, genelist_bg, genecounts){
+    
+    geneuris <- vector()
+    
+    for(i in 1:length(genenames)){
+        
+        geneuris <- c(geneuris, getGeneUriFromName(genenames[[i]], taxon))
+    }
+    
+    #if none of these gens are found then do not go further
+    if(length(geneuris)==0){
+        message("None of the genelist was found in the Atlas data. Halting enrichment.")
+    }    
+    else{
+        results <- doFishersEnrichment(geneuris, genelist_bg, genecounts)
+        return(results)
+    }
+}
+
+
+
+
+###############
+#function to do enrichment analysis using Fisher's exact test based on a gene list specified by common gene name
+#input requires a vector of the common gene names and a taxon id e.g. obo:NCBITaxon_9606 for human (note genes from multiple species not allowed) 
+###############
+doFishersEnrichmentForEnsemblIds <- function(geneids, taxon, genelist_bg, genecounts){
+    
+    geneuris <- vector()
+    
+    for(i in 1:length(geneids)){
+        
+        geneuris <- c(geneuris, getGeneUriFromEnsemblId(geneids[[i]], taxon))
+    }
+    
+    #if none of these gens are found then do not go further
+    if(length(geneuris)==0){
+        message("None of the genelist was found in the Atlas data. Halting enrichment.")
+    }   
+    else{
+        results <- doFishersEnrichment(geneuris, genelist_bg, genecounts)
+        return(results)
+    }
+}
+
+
+
+##############
+#function to filter set of enriched factors given a specific p-value cutoff, default is 0.05
+#results are then vizualised as a bar plot and also returned as a vector of pvalues to factor
+##############
+vizPvalues <- function(resultset, cutoff = "0.05"){
+    
+    
+    results <- vector()
+    names <- vector()
+    
+    for (i in 1:length(resultset)){
+        
+        pvalue <- resultset[[i]]@p.value
+        #if the p value is below the user cut off
+        if (round(pvalue, digits=5) <= cutoff){
+            #message(resultset[[i]]@label, "   ", pvalue)     
+            
+            results <- c(results, pvalue)
+            names <- c(names, resultset[[i]]@label)
+            results <- setNames(results, names)    
+            
+        }  
+        
+    }
+    
+    results <- sort(results)
+    
+    par(mar=c(3,12,1,1))
+    barplot(height=results, names.arg=names(results), horiz = TRUE, las=1, xlab = "p-value", 
+            col = hcl(seq(0, 200, length = length(results))), cex.names=0.8)
+    title(main = list(paste("Enrichment with p-vlaue cut off ",cutoff ), font = 3))
+    
+    return(results)
+}
+
+
+###########
+#function to get uri of species based on name. Used for functions where species can be specified 
+#works for human, rat, mouse, arabidopsis and drosophila
+###########
+getTaxonURI <- function(taxonName){
+    
+    taxonName <- tolower(taxonName)
+    
+    if(taxonName == "human" || taxonName == "homo sapiens"){
+        message("human")
+        uri <- "obo:NCBITaxon_9606"
+        
+    }
+    else if(taxonName == "mouse" || taxonName == "mus musculus"){
+        message("mouse")
+        uri <- "obo:NCBITaxon_10090"
+    }
+    else if(taxonName == "arabidopsis thaliana" || taxonName == "arabidopsis"){
+        message("arabidopsis")
+        uri <- "obo:NCBITaxon_3702"
+    }   
+    else if(taxonName == "rat" || taxonName == "rattus norvegicus"){
+        message("rattus norvegicus")
+        uri <- "obo:NCBITaxon_10116"
+    }
+    else if(taxonName == "fly" || taxonName == "drosophila" || taxonName == "drosophila melanogaster"){
+        message("drosophila")
+        uri <- "obo:NCBITaxon_7227"
+    }
+    else{
+        message("Could not identify species")
+    }
+    
+    return(uri)
+    
+}
+
+
+
+

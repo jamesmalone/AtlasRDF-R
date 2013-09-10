@@ -1,0 +1,10 @@
+Package: AtlasRDF
+Type: Package
+Title: Gene Expression Atlas query and gene set enrichment package.
+Version: 1.0
+Date: 2013-09-09
+Author: James Malone, Simon Jupp, Maryam Soleimani
+Maintainer: James Malone <malone@ebi.ac.uk>
+Depends: hash, SPARQL, methods
+Description: Query the Gene Expression Atlas RDF data at the European Bioinformatics Institute using genes, experimental factors (such as disease, cell type, compound treatments), pathways and proteins. Also contains a function to perform an enrichment of your gene list across Experimental Factor Ontology (EFO) using the Atlas background set. Note: use the R SPARQL package available at http://cran.r-project.org/web/packages/SPARQL/ 
+License: Apache 2.0
