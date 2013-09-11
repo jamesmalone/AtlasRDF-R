@@ -54,7 +54,7 @@ getAllEnsemblGenesForExFactor <- function(exfactor, limit = 0, endpoint="http://
                 "}  \n",
             limitC )
     
-    
+    message("Performing query please wait...")
     res<-SPARQL(url=endpoint,query)
     return (res$results)    
 }
@@ -84,7 +84,7 @@ getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0
             "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
             "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
             
-            "SELECT DISTINCT ?dbXref ?geneName ?ensemblid \n",      
+            "SELECT DISTINCT ?dbXref ?genename ?ensemblid \n",      
             "WHERE { \n",           
                 "?expUri atlasterms:hasAnalysis ?analysis . \n",    
                 "?analysis atlasterms:hasExpressionValue ?value . \n",       
@@ -92,7 +92,7 @@ getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0
                 "?value atlasterms:isMeasurementOf ?probe . \n",     
                 "?probe atlasterms:dbXref ?dbXref . \n",
                 "?dbXref rdf:type <http://rdf.ebi.ac.uk/terms/atlas/EnsemblDatabaseReference> . \n",
-                "?dbXref rdfs:label ?geneName . \n",  
+                "?dbXref rdfs:label ?genename . \n",  
                 "?dbXref dcterms:identifier ?ensemblid . \n",
                 "?dbXref atlasterms:taxon" , taxon , ". \n",    
                 "?factor atlasterms:propertyType ?propertyType . \n",       
@@ -101,7 +101,7 @@ getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0
                 "}  \n",
             limitC )
     
-    
+    message("Performing query please wait...")
     res<-SPARQL(url=endpoint,query)
     return (res$results)    
 }
@@ -121,7 +121,6 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
     warning ("limit should be an integer, limit omitted from the query")
     
     query <- paste( "#AtlasRDF-R query \n",
-            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -142,6 +141,7 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
                 "}\n", 
             limitC, sep="")
     
+    message("Performing query please wait...")
     res<-SPARQL(url=endpoint,query)
     return (res$results)    
 }
@@ -155,7 +155,6 @@ getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/r
     experimenturi <- paste("atlas:",experiment, sep="")
     
     query <- paste( "#AtlasRDF-R query \n",
-            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -179,6 +178,7 @@ getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/r
                 "?factor atlasterms:propertyValue ?propertyValue . \n",        
                 "}")
     
+    message("Performing query please wait...")
     res<-SPARQL(url=endpoint,query)
     return (res$results)          
 }
@@ -188,12 +188,12 @@ getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/r
 #########
 #get common name for any entity (if available), for example the common gene name 
 #requires input parameter of uri of entity in form <http://entityuri> NOTE: including angle brackets
+#e.g. cancer for "efo:EFO_0000311"
 #########
 
 getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     query <- paste( "#AtlasRDF-R query \n",
-            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -213,34 +213,6 @@ getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sp
 }
 
 
-########
-#get the human readable label (if there is one) for any class in the data 
-#e.g. cancer for "efo:EFO_0000311"
-########
-getClassLabel <- function(classURI, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
-    
-    
-    
-    query <- paste( "#BioRDF-R query \n",
-            "#function: getClassLabel \n",
-            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
-            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
-            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
-            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
-            "PREFIX sio: <http://semanticscience.org/resource/> \n",
-            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
-            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
-            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
-            
-            "SELECT distinct ?name WHERE { \n",
-                classURI , " rdfs:label ?name . } \n" )
-    
-    labels <- SPARQL(url=endpoint, query)
-    return (labels$results)
-    
-}
-
 
 #########
 #query to get pathways associated 
@@ -248,7 +220,6 @@ getClassLabel <- function(classURI, endpoint = "http://www.ebi.ac.uk/rdf/service
 getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     query <- paste( "#BioRDF-R query \n",
-            "#function: getClassLabel \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -260,7 +231,7 @@ getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.e
             "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
             "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
             
-            "SELECT distinct ?pathwayname ?expressionValue ?pvalue \n",
+            "SELECT distinct ?pathwayname ?pathway ?expressionvalue ?pvalue \n",
             "WHERE { \n",
                 "?protein rdf:type biopax3:Protein . \n",
                 "?protein biopax3:memberPhysicalEntity \n",
@@ -282,7 +253,7 @@ getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.e
                 "?value atlasterms:hasFactorValue ?factor . \n", 
                 "?value atlasterms:isMeasurementOf ?probe . \n",
                 "?value atlasterms:pValue ?pvalue . \n",
-                "?value rdfs:label ?expressionValue . \n",
+                "?value rdfs:label ?expressionvalue . \n",
                 "?probe atlasterms:dbXref ?dbXref . \n",
                 "} \n",
             "ORDER BY ASC (?pvalue) ")
@@ -295,7 +266,7 @@ getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.e
 
 
 ##########
-#
+#draw gene expression levels vs factors for a given Atlas experiment
 ##########
 drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
@@ -304,7 +275,6 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpo
     experiment <- paste("atlas:",experimentid, sep="")
     
     query <- paste( "#BioRDF-R query \n",
-            "#function: getClassLabel \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -345,26 +315,26 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpo
     while (i <= length(Genename)) {
         
         if((df$TStat[i] >= tstatsignificance) || (df$TStat[i] <= (-1*tstatsignificance))){
-        
+            
             gn <-df$Genename[i]
             var <-df$Factor[i]
             tstat <-df$TStat[i]
-
-        
+            
+            
             rowindex <- match(gn, rownames(values))
             colindex <- match(var, unique(Factor))
             values[rowindex,colindex] <- tstat
         }
-
+        
         i<-i+1
     }
     #fix this
     values<-values[-which(rowSums(values==0) > 5),]
     #stats::heatmap(values, scale="none", col = cm.colors(256))
-
+    
     par(oma=c(6,2,2,2))
     heatmap(values, scale="none", col = cm.colors(256))
-
+    
     return(values)
 }
 
@@ -372,9 +342,76 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpo
 
 #########
 #get mappings from NCBO for an efo term
+#searchuri is an ontology class uri for which efo mappings are to be found
+#e.g. <http://purl.bioontology.org/ontology/SNOMEDCT/87163000>  (leukemia in snomed)
+#e.g. <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C2985> (diabetes mellitus NCI Thesaurus)
+#e.g. <http://purl.bioontology.org/ontology/ICD10CM/J45> (asthma in ICD-10) 
 #########
+getOntologyMappings <- function(searchuri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX maps: <http://protege.stanford.edu/ontologies/mappings/mappings.rdfs#> \n",
+            
+            "SELECT  distinct ?efouri \n",
+            "WHERE {  \n",
+                "SERVICE <http://sparql.bioontology.org/mappings/sparql?apikey=aa5bfd22-462e-422a-a88c-4055ba36cd1e>{ \n",
+                    
+                    "?mapping maps:source ",searchuri," ; \n",
+                    " maps:target_ontology <http://bioportal.bioontology.org/ontologies/1136> . \n",          
+                    "?mapping maps:target ?efouri  \n",        
+                    " }\n",
+                "}", sep="")
+    
+    efouri <- SPARQL(url=endpoint, query) 
+    
+    
+    return(efouri$results)   
+}
 
 
+
+#######
+#get genes for a given pubmedid, if the experiment is in Atlas
+#e.g. "11027337"
+######
+getGeneListFromPubmedid <- function(searchid, endpoint = "http://wwwdev.ebi.ac.uk/rdf/services/atlas/sparql"){
+            
+    searchuri<- paste("<http://identifiers.org/pubmed/",searchid,">", sep="")
+            
+    query <- paste( "#AtlasRDF-R query \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?experimenturi \n",       
+            "WHERE {\n",           
+            "?experimenturi rdf:type atlasterms:Experiment . \n",  
+            "?experimenturi atlasterms:pubmedid", searchuri ," . \n",        
+            "}")
+    
+    message("Performing query please wait...")
+    message(query)
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)      
+ 
+}
 
 
 ###################
@@ -387,10 +424,7 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpo
 ###########
 getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    
-    
     query <- paste( "#BioRDF-R query \n",
-            "#function: getClassLabel \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -406,7 +440,7 @@ getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk
                 "?geneuri rdf:type atlasterms:EnsemblDatabaseReference . \n",
                 "?geneuri atlasterms:taxon ", taxon , ". \n",
                 "?geneuri rdfs:label ?label. \n", 
-                "FILTER regex(str(?label), \"^",genename,"$\"). \n", 
+                "FILTER regex(str(?label), \"^",genename,"$\", \"i\"). \n", 
                 "}", sep="")
     
     uris <- SPARQL(url=endpoint, query)
@@ -415,15 +449,41 @@ getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk
 }
 
 
+getExFactorURIFromLabel <- function(label, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "#BioRDF-R query \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?efouri WHERE { \n",
+                "?efouri rdfs:subClassOf* efo:EFO_0000001 . \n",
+                "?efouri rdfs:label ?label . \n", 
+                "FILTER regex(str(?label), \"^",label,"$\", \"i\"). \n", 
+                "}", sep="")
+    
+    uris <- SPARQL(url=endpoint, query)
+    return (uris$results)
+    
+}
+
+
+
 ###########
-#get gene uris given ensembl gene id and a taxon
+#get gene uris given ensembl gene id 
 ###########
-getGeneUriFromEnsemblId <- function(id, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+getGeneUriFromEnsemblId <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     
     
     query <- paste( "#BioRDF-R query \n",
-            "#function: getClassLabel \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -437,9 +497,40 @@ getGeneUriFromEnsemblId <- function(id, taxon, endpoint = "http://www.ebi.ac.uk/
             
             "SELECT distinct ?geneuri WHERE { \n",
                 "?geneuri rdf:type atlasterms:EnsemblDatabaseReference . \n",
-                "?geneuri atlasterms:taxon ", taxon , ". \n",
                 "?geneuri dcterms:identifier ?geneid. \n", 
-                "FILTER regex(str(?geneid), \"",id,"\"). \n", 
+                "FILTER regex(str(?geneid), \"",id,"\", \"i\"). \n", 
+                "}", sep="")
+    
+    uris <- SPARQL(url=endpoint, query)
+    return (uris$results)
+    
+}
+
+
+###########
+#get pathway uri for given pathway name
+###########
+getPathwayUriFromName <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste( "#BioRDF-R query \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
+            
+            "SELECT distinct ?pathwayuri ?label WHERE { \n",
+                "?pathwayuri rdf:type biopax3:Pathway . \n",
+                "?pathwayuri biopax3:displayName ?label . \n",
+                "FILTER regex(str(?label), \"",id,"\", \"i\"). \n", 
                 "}", sep="")
     
     uris <- SPARQL(url=endpoint, query)
