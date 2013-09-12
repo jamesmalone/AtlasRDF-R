@@ -385,7 +385,7 @@ getOntologyMappings <- function(searchuri, endpoint = "http://www.ebi.ac.uk/rdf/
 #get genes for a given pubmedid, if the experiment is in Atlas
 #e.g. "11027337"
 ######
-getGeneListFromPubmedid <- function(searchid, endpoint = "http://wwwdev.ebi.ac.uk/rdf/services/atlas/sparql"){
+getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
             
     searchuri<- paste("<http://identifiers.org/pubmed/",searchid,">", sep="")
             
@@ -921,6 +921,117 @@ vizPvalues <- function(resultset, cutoff = "0.05"){
     
     return(results)
 }
+
+###########
+#function to filter out subclasses of a given class from the enrichment results
+#e.g. filterparentclass="obo:CHEBI_37577" would filter out all chemical compounds from the results
+###########
+excludeSubclasses <- function(filterparentclass, resultset, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    #get the subclass uris for the class to filter out
+    query <- paste( "#BioRDF-R query \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?classuri WHERE { \n",           
+            "?classuri rdfs:subClassOf*", filterparentclass,". \n",    
+            "}")
+    
+    uris <- SPARQL(url=endpoint, query)
+    
+    sizeunfilitered <- length(resultset)     
+    
+    #create vector of uris in the result set
+    resulturis <- vector()
+    for(i in 1:length(res)){
+        resulturis <- c(resulturis, resultset[[i]]@factoruri)
+    }
+    
+    
+    #loop through each result and remove it if it exists in the results
+    for(i in 1:nrow(uris$results)){
+        
+        #if this is not null then there is a match
+        if(uris$results[i,] %in% resulturis){
+            
+            #get element number but from filtered list as this will be different because it's being resized
+            removelement <- match(uris$results[i,], resulturis)
+            #remove it from the list
+            resultset <- resultset[-(removelement)]
+            #and from vector
+            resulturis <- resulturis[-(removelement)]     
+        }       
+    }  
+    message("Removed " ,(sizeunfilitered - length(resultset))," factors from result set")    
+    
+    return (resultset)    
+}
+
+
+
+
+###########
+#function to include only subclasses of a given class from the enrichment results, removing all the rest
+#e.g. includeparentclass="obo:CHEBI_37577" would filter out all chemical compounds from the results
+###########
+includeOnlySubclasses <- function(includeparentclass, resultset, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    #create new filtered results
+    filteredresults <- vector()
+    
+    #get the subclass uris for the class to filter out
+    query <- paste( "#BioRDF-R query \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?classuri WHERE { \n",           
+            "?classuri rdfs:subClassOf*", includeparentclass,". \n",    
+            "}")
+    
+    uris <- SPARQL(url=endpoint, query)
+    
+    
+    #create vector of uris in the result set
+    resulturis <- vector()
+    for(i in 1:length(res)){
+        resulturis <- c(resulturis, resultset[[i]]@factoruri)
+    }
+    
+    #loop through each result and remove it if it exists in the results
+    for(i in 1:nrow(uris$results)){
+        
+        #if this is not null then there is a match
+        if(uris$results[i,] %in% resulturis){
+            
+            
+            
+            #get element number but from filtered list as this will be different because it's being resized
+            includeelement <- match(uris$results[i,], resulturis)
+            #remove it from the list
+            filteredresults <- c(filteredresults,resultset[includeelement])         
+        }        
+    }
+    message("Removed " ,(length(resulturis) - length(filteredresults))," factors from result set")    
+    
+    return (filteredresults)   
+}
+
 
 
 ###########
