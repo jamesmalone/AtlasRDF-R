@@ -150,7 +150,7 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
 ########
 #get all genes for given experiment, expeirment should be sent in form of experiment ID e.g. E-GEOD-1085
 ########
-getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     experimenturi <- paste("atlas:",experiment, sep="")
     
@@ -183,6 +183,41 @@ getGenesForExperiment <- function(experiment, endpoint = "http://www.ebi.ac.uk/r
     return (res$results)          
 }
 
+
+
+########
+#get all genes for given experiment, expeirment should be sent in form of experiment ID e.g. E-GEOD-1085
+########
+getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "#AtlasRDF-R query \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            
+            "SELECT distinct ?expressionValue ?dbXref ?pvalue ?propertyValue \n",       
+            "WHERE {\n",           
+            experiment,"atlasterms:hasAnalysis ?analysis . \n",    
+            "?analysis atlasterms:hasExpressionValue ?value . \n",           
+            "?value rdfs:label ?expressionValue . \n",     
+            "?value atlasterms:pValue ?pvalue . \n",      
+            "?value atlasterms:hasFactorValue ?factor . \n",      
+            "?value atlasterms:isMeasurementOf ?probe . \n",     
+            "?probe atlasterms:dbXref ?dbXref . \n",       
+            "?factor atlasterms:propertyType ?propertyType . \n",       
+            "?factor atlasterms:propertyValue ?propertyValue . \n",        
+            "}")
+    
+    message("Performing query please wait...")
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)          
+}
 
 
 #########
@@ -407,9 +442,13 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
             "}")
     
     message("Performing query please wait...")
-    message(query)
+
     res<-SPARQL(url=endpoint,query)
-    return (res$results)      
+    message("Getting genes for experiment ", res$results[1])
+
+    genelist <- getGenesForExperimentURI(res$results[1], endpoint)    
+    
+    return(genelist)      
  
 }
 
@@ -840,13 +879,13 @@ doFishersEnrichment <- function(genelist, genelist_bg, genecounts){
 #function to do enrichment analysis using Fisher's exact test based on a gene list specified by common gene name
 #input requires a vector of the common gene names and a taxon id e.g. obo:NCBITaxon_9606 for human (note genes from multiple species not allowed) 
 ###############
-doFishersEnrichmentForGeneNames <- function(genenames, taxon, genelist_bg, genecounts){
+doFishersEnrichmentForGeneNames <- function(genenames, taxon, genelist_bg, genecounts, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     geneuris <- vector()
     
     for(i in 1:length(genenames)){
         
-        geneuris <- c(geneuris, getGeneUriFromName(genenames[[i]], taxon))
+        geneuris <- c(geneuris, getGeneUriFromName(genenames[[i]], taxon, endpoint))
     }
     
     #if none of these gens are found then do not go further
@@ -951,7 +990,7 @@ excludeSubclasses <- function(filterparentclass, resultset, endpoint="http://www
     
     #create vector of uris in the result set
     resulturis <- vector()
-    for(i in 1:length(res)){
+    for(i in 1:length(resultset)){
         resulturis <- c(resulturis, resultset[[i]]@factoruri)
     }
     
@@ -1009,7 +1048,7 @@ includeOnlySubclasses <- function(includeparentclass, resultset, endpoint="http:
     
     #create vector of uris in the result set
     resulturis <- vector()
-    for(i in 1:length(res)){
+    for(i in 1:length(resultset)){
         resulturis <- c(resulturis, resultset[[i]]@factoruri)
     }
     

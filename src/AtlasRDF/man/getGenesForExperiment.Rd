@@ -21,11 +21,11 @@ getGenesForExperiment(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/
 }
 
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+data frame containg following elements
+  \item{expressionValue}{The summarised expression value for this gene}
+ \item{dbXref}{The URI identifier for this gene}
+ \item{pvalue}{The p-value representing differentially expression for this gene}
+    \item{propertyValue}{The property value for which this gene was reported as differentially expressed}
 }
 
 \author{
@@ -33,8 +33,8 @@ James Malone, Simon Jupp
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
-
+###get genes for experiment ID E-MTAB-921
+##res <- getGenesForExperiment("E-MTAB-921")
+###list first gene in the experiment
+##res[1,]
 }

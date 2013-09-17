@@ -13,10 +13,10 @@ getExperimentsByDescription(searchterm, limit = 0, endpoint = "http://www.ebi.ac
 
 \arguments{
   \item{searchterm}{
-%%     ~~Describe \code{searchterm} here~~
+  The search term.
 }
   \item{limit}{
-%%     ~~Describe \code{limit} here~~
+ Optional limit on number of returned results (default is everything)
 }
   \item{endpoint}{
     The location of the SPARQL endpoint - default value is live Atlas endpoint
@@ -25,11 +25,10 @@ getExperimentsByDescription(searchterm, limit = 0, endpoint = "http://www.ebi.ac
 }
 
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+
+ \item{$experiment}{Atlas Experiment ID of matched experiment to search term'}
+ \item{$description}{Description of experiment which matched term}
+
 }
 
 \author{
@@ -37,9 +36,8 @@ James Malone, Simon Jupp
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
+###get experiments which contain the word liver in the description
+#getExperimentsByDescription("liver")
 
 }
 

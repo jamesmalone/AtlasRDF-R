@@ -22,11 +22,7 @@ URI of the class for which the label is required.
 }
 
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+List of labels for the class URI
 }
 
 \author{
@@ -34,9 +30,8 @@ James Malone, Simon Jupp
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
+###get the label for the class efo:EFO_0001185 (HeLa)
+#getLabel("efo:EFO_0001185")
 
 }
 

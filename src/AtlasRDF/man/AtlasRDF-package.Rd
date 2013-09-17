@@ -6,7 +6,23 @@
     Gene Expression Atlas query and gene set enrichment package.
 }
 \description{
-    Query the Gene Expression Atlas RDF data at the European Bioinformatics Institute using genes, experimental factors (such as disease, cell type, compound treatments), pathways and proteins. Also contains a function to perform an enrichment of your gene list across Experimental Factor Ontology (EFO) using the Atlas background set. }
+    Query the Gene Expression Atlas RDF data at the European Bioinformatics Institute using genes, experimental factors (such as disease, cell type, compound treatments), pathways and proteins. Also contains a function to perform an enrichment of your gene list across Experimental Factor Ontology (EFO) using the Atlas background set.
+}
+
+\note{
+    Linux users may need to perform the following:
+    \tabular{ll}{       
+        sudo apt-get install libxml2-dev\cr      
+        from R environment: install.package("XML")\cr
+        sudo apt-get install libcurl4-gnutls-dev\cr        
+        from R environment: install.package("RCurl")\cr
+        from R environment: install.package("hash")\cr
+       from R environment: install.package("SPARQL")\cr
+
+    }
+}
+
+
 \details{
     \tabular{ll}{
         Package: \tab AtlasRDF\cr
@@ -26,7 +42,7 @@
     Gene Expression Atlas RDF - http://wwwdev.ebi.ac.uk/rdf/services/atlas/
     Gene Expression Atlas - http://www.ebi.ac.uk/gxa
     Experimental Factor Ontology - http://www.ebi.ac.uk/efo
-    Kapushesky M, Adamusiak T, Burdett T, Culhane A, Farne A, Filippov A, Holloway E, Klebanov A, Kryvych N, Kurbatova N, Kurnosov P, <b>Malone J</b>, Melnichuk O, Petryszak R, Pultsin N, Rustici G, Tikhonov A, Travillian RS, Williams E, Zorin A, Parkinson H, Brazma A. (2012) Gene Expression Atlas update--a value-added database of microarray and sequencing-based functional genomics experiments. Nucleic Acids Res. 2012 Jan;40(Database issue):D1077-81.
+    Kapushesky M, Adamusiak T, Burdett T, Culhane A, Farne A, Filippov A, Holloway E, Klebanov A, Kryvych N, Kurbatova N, Kurnosov P, Malone J, Melnichuk O, Petryszak R, Pultsin N, Rustici G, Tikhonov A, Travillian RS, Williams E, Zorin A, Parkinson H, Brazma A. (2012) Gene Expression Atlas update--a value-added database of microarray and sequencing-based functional genomics experiments. Nucleic Acids Res. 2012 Jan;40(Database issue):D1077-81.
 }
 \keyword{ package }
 
@@ -43,8 +59,9 @@
     
     ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
     #load the background files for the species of interest (requires downloading)
-    #load("human_bg/human_gene_list.RData")   #human_genelist_bg
-    #load("human_bg/human_factor_counts.RData")    #human_factor_counts
+    #find background sets at http://
+    #load("human/human_gene_list.RData")   #human_genelist_bg
+    #load("human/human_factor_counts.RData")    #human_factor_counts
     
     ###creat or load your genelist of interest
     #genelist <- c("GSTT1", "PLCE1", "XIST", "ENOSF-1", "AHR", "FSTL1", "YIPF5", "RBM5", "TNP01", "CREB1", "NOX4", "FLII")

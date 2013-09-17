@@ -47,8 +47,8 @@ Maryam Soleimani, European Bioinformatics Institute
 
 ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
 #load the background files for the species of interest (requires downloading)
-#load("human_gene_list.RData")   #human_genelist_bg
-#load("human_factor_counts.RData")    #human_factor_counts
+#load("human/human_gene_list.RData")   #human_genelist_bg
+#load("human/human_factor_counts.RData")    #human_factor_counts
 
 ###creat or load your genelist of interest
 genelist <- c("<http://identifiers.org/ensembl/ENSG00000184674>", 

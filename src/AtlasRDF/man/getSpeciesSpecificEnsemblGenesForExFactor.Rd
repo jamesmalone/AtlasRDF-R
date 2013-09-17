@@ -12,14 +12,11 @@ getSpeciesSpecificEnsemblGenesForExFactor(exfactor, taxon, limit = 0, endpoint="
 }
 
 \arguments{
- \item{exfactor}{
-%%     ~~Describe \code{exfactor} here~~
+ \item{exfactor}{URI of the experimental factor search term
 }
- \item{taxon}{
-%%     ~~Describe \code{taxon} here~~
+ \item{taxon}{URI of the species to limit search to
 }
-  \item{limit}{
-%%     ~~Describe \code{limit} here~~
+  \item{limit}{Optional limit to number of genes returned (default is all)
 }
    \item{endpoint}{
         The location of the SPARQL endpoint - default value is live Atlas endpoint
@@ -27,11 +24,11 @@ getSpeciesSpecificEnsemblGenesForExFactor(exfactor, taxon, limit = 0, endpoint="
 }
 
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+data frame of results with the following:
+  \item{dbXref }{URI identifier of the gene}
+ \item{genename }{Common gene name}
+    \item{ensemblid }{ENSEMBL ID of gene}
+
 }
 
 \author{
@@ -39,8 +36,7 @@ James Malone, Simon Jupp
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
+###get genes differentially expressed for HeLa cells (efo:EFO_0001185) in human (obo:NCBITaxon_9606)
+#getSpeciesSpecificEnsemblGenesForExFactor("efo:EFO_0001185", "obo:NCBITaxon_9606")
 
 }

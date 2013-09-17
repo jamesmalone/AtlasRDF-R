@@ -8,16 +8,13 @@ Get gene URI from an ENSEMBL ID.
 Get the URI for an ENSEMBL gene based on the ENSEMBL ID.
 }
 \usage{
-getGeneUriFromEnsemblId(id, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql")
+getGeneUriFromEnsemblId(id, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql")
 }
 
 \arguments{
   \item{id}{
      ENSEMBL gene ID
 }
-  \item{taxon}{
-        The URI of the species of interest
-    }
   \item{endpoint}{
       The location of the SPARQL endpoint - default value is live Atlas endpoint
 }
@@ -34,10 +31,8 @@ James Malone, Simon Jupp
 
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
-
+###get the URI identifier for a gene based on the ENSEMBL ID
+#getGeneUriFromEnsemblId("ENSMUSG00000031314")
 
 }
 

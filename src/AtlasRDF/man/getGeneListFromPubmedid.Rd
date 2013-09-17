@@ -1,0 +1,39 @@
+\name{getGeneListFromPubmedid}
+\alias{getGeneListFromPubmedid}
+
+\title{
+Get gene lists in Atlas for a given pubmed id (assuming the data is in Atlas)
+}
+\description{
+Get differentially expressed genes reported in an experiment in Atlas for which a given pubmed id is linked (assuming the data is in Atlas)
+}
+\usage{
+getGeneListFromPubmedid(searchid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql")
+}
+
+\arguments{
+  \item{searchid}{
+   PubMed ID to find data for 
+    }
+    \item{endpoint}{
+        SPARQL endpoint to query data from. Default value is the live Atlas SPARQL endpoint but this can be overidden.     
+    }
+}
+
+\value{
+List of genes for experiment (via PubMed ID)
+}
+
+\author{
+James Malone, Simon Jupp
+}
+
+
+\examples{
+##---- Should be DIRECTLY executable !! ----
+##-- ==>  Define data, use random,
+##--    or do  help(data=index)  for the standard data sets.
+
+#getGeneListFromPubmedid("19668377")
+}
+

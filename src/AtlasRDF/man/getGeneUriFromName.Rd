@@ -13,10 +13,10 @@
 
 \arguments{
     \item{genename}{
-        %%     ~~Describe \code{genename} here~~
+        The common gene name by which to search
     }
     \item{taxon}{
-        %%     ~~Describe \code{taxon} here~~
+        The URI of the taxon to search genes for, use function getTaxonURI to get the URI
     }
     \item{endpoint}{
         The location of the SPARQL endpoint - default value is live Atlas endpoint
@@ -24,11 +24,7 @@
 }
 
 \value{
-    %%  ~Describe the value returned
-    %%  If it is a LIST, use
-    %%  \item{comp1 }{Description of 'comp1'}
-    %%  \item{comp2 }{Description of 'comp2'}
-    %% ...
+list of gene URIs matching the query: note this can be more than one
 }
 
 \author{
@@ -36,9 +32,7 @@
 }
 
 \examples{
-    ##---- Should be DIRECTLY executable !! ----
-    ##-- ==>  Define data, use random,
-    ##--    or do  help(data=index)  for the standard data sets.
-    
+###get the gene URI identifier based on the common gene name for "SRGN" in human
+#getGeneUriFromName("SRGN", "obo:NCBITaxon_9606")
 }
 
