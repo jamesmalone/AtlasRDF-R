@@ -6,6 +6,7 @@ Perform a gene set enrichment using gene list based on gene URIs.
 }
 \description{
 Perform an enrichment of an input gene list using the Atlas as a background set for a specified species. The genes are given as a set of gene URIs (e.g. <http://identifiers.org/ensembl/ENSG00000229807>). The results are a list of experimental factors for which these genes are enriched.
+    Access the backgroun data sets for enrichment from https://github.com/jamesmalone/AtlasRDF-R
 }
 \usage{
 doFishersEnrichment(genelist, genelist_bg, genecounts)
@@ -47,8 +48,8 @@ Maryam Soleimani, European Bioinformatics Institute
 
 ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
 #load the background files for the species of interest (requires downloading)
-#load("human/human_gene_list.RData")   #human_genelist_bg
-#load("human/human_factor_counts.RData")    #human_factor_counts
+#load("human_gene_list.RData")   #human_genelist_bg
+#load("human_factor_counts.RData")    #human_factor_counts
 
 ###creat or load your genelist of interest
 genelist <- c("<http://identifiers.org/ensembl/ENSG00000184674>", 

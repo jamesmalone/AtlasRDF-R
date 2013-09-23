@@ -2,42 +2,37 @@
 \alias{getPathwayUriFromName}
 
 \title{
-Get pathway URI given a pathway name
+    Get pathway URI given a pathway name
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+    Given the name of a pathway find URI(s) that match this name
 }
 \usage{
-getPathwayUriFromName(id, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql")
+    getPathwayUriFromName(name, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{id}{
-%%     ~~Describe \code{id} here~~
+    \item{name}{
+       The textual name of the pathway to search for  
+    }
+    \item{endpoint}{
+        The location of the SPARQL endpoint - default value is live Atlas endpoint
+    }
 }
-  \item{endpoint}{
-%%     ~~Describe \code{endpoint} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+data frame containing slots
+    \item{pathwayuri}{The URI of the corresponding pathway}
+    \item{label}{The textual human readable name of the pathway}
+
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
-James Malone, Simon Jupp
+    James Malone, Simon Jupp
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-
+    ##get pathways which have the phrase 'ligand binding' included in their name
+    getPathwayUriFromName("ligand binding")
 }
 

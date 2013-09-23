@@ -142,6 +142,7 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
             limitC, sep="")
     
     message("Performing query please wait...")
+
     res<-SPARQL(url=endpoint,query)
     return (res$results)    
 }
@@ -179,6 +180,7 @@ getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk
                 "}")
     
     message("Performing query please wait...")
+
     res<-SPARQL(url=endpoint,query)
     return (res$results)          
 }
@@ -186,7 +188,7 @@ getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk
 
 
 ########
-#get all genes for given experiment, expeirment should be sent in form of experiment ID e.g. E-GEOD-1085
+#get all genes for given experiment, expeirment should be sent in form of experiment URI e.g. <http://rdf.ebi.ac.uk/resource/atlas/E-GEOD-13396>
 ########
 getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
@@ -218,6 +220,48 @@ getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.u
     res<-SPARQL(url=endpoint,query)
     return (res$results)          
 }
+
+
+######
+#query for experiments that contain a specific ensembl gene ID and which is reported as diff expressed
+######
+getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){    
+    ensemblid <- paste("identifiers:", geneid, sep="")
+    
+    query <- paste( "#AtlasRDF-R query \n",    
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX identifiers:<http://identifiers.org/ensembl/> \n",
+            
+            "SELECT distinct ?expUri \n",
+            "WHERE { \n",            
+                "?expUri atlasterms:hasAnalysis ?analysis . \n",   
+                "?analysis atlasterms:hasExpressionValue ?value . \n",      
+                "?value a ?diffExpType . \n",
+                "?diffExpType rdfs:subClassOf atlasterms:DifferentialExpressionRatio . \n",     
+                "?value rdfs:label ?expressionValue . \n",     
+                "?value atlasterms:pValue ?pvalue . \n",      
+                "?value atlasterms:hasFactorValue ?factor . \n",      
+                "?value atlasterms:isMeasurementOf ?probe . \n",    
+                "?probe atlasterms:dbXref", ensemblid ,". \n",
+                
+                "}")       
+    
+    
+    
+    res<-SPARQL(url=endpoint,query)
+    return (res$results)  
+    
+    
+}
+
 
 
 #########
@@ -303,7 +347,7 @@ getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.e
 ##########
 #draw gene expression levels vs factors for a given Atlas experiment
 ##########
-drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance = 5, numoffactorsdiffexpressedacross = 1, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     
     
@@ -363,8 +407,11 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance, endpo
         
         i<-i+1
     }
+    
+    
+    
     #fix this
-    values<-values[-which(rowSums(values==0) > 5),]
+    values<-values[-which(rowSums(values==0) > numoffactorsdiffexpressedacross),]
     #stats::heatmap(values, scale="none", col = cm.colors(256))
     
     par(oma=c(6,2,2,2))
@@ -549,7 +596,7 @@ getGeneUriFromEnsemblId <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/ser
 ###########
 #get pathway uri for given pathway name
 ###########
-getPathwayUriFromName <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+getPathwayUriFromName <- function(name, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     
     
@@ -569,7 +616,7 @@ getPathwayUriFromName <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/servi
             "SELECT distinct ?pathwayuri ?label WHERE { \n",
                 "?pathwayuri rdf:type biopax3:Pathway . \n",
                 "?pathwayuri biopax3:displayName ?label . \n",
-                "FILTER regex(str(?label), \"",id,"\", \"i\"). \n", 
+                "FILTER regex(str(?label), \"",name,"\", \"i\"). \n", 
                 "}", sep="")
     
     uris <- SPARQL(url=endpoint, query)

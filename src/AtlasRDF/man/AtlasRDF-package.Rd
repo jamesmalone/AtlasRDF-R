@@ -6,7 +6,9 @@
     Gene Expression Atlas query and gene set enrichment package.
 }
 \description{
-    Query the Gene Expression Atlas RDF data at the European Bioinformatics Institute using genes, experimental factors (such as disease, cell type, compound treatments), pathways and proteins. Also contains a function to perform an enrichment of your gene list across Experimental Factor Ontology (EFO) using the Atlas background set.
+    Query the Gene Expression Atlas RDF data at the European Bioinformatics Institute using genes, experimental factors (such as disease, cell type, compound treatments), 
+    pathways and proteins. Also contains a function to perform an enrichment of your gene list across Experimental Factor Ontology (EFO) using the Atlas background set.
+    Access the backgroun data sets for enrichment from https://github.com/jamesmalone/AtlasRDF-R
 }
 
 \note{
@@ -48,26 +50,26 @@
 
 \examples{
     ###find experiments where the description contains a given search term
-    #experimentlist <- getExperimentsByDescription("breast carcinoma")
+    experimentlist <- getExperimentsByDescription("breast carcinoma")
     
     ###get gene list for given experiment ID
-    #genelist <- getGenesForExperiment("E-GEOD-1561")
+    genelist <- getGenesForExperimentID("E-MEXP-3739")
     
     ###get list of pathways associated with a gene for which the genes are differentially expressed for a given condition (Type I diabetes in this case)
-    #pathwayinfo <- getPathwaysFromGenesAndCondition("efo:EFO_0001359")
-    #pathwayinfo$pathwayname
+    pathwayinfo <- getPathwaysFromGenesAndCondition("efo:EFO_0001359")
+    pathwayinfo$pathwayname
     
     ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
     #load the background files for the species of interest (requires downloading)
-    #find background sets at http://
-    #load("human/human_gene_list.RData")   #human_genelist_bg
-    #load("human/human_factor_counts.RData")    #human_factor_counts
+    #find background sets at https://github.com/jamesmalone/AtlasRDF-R
+    #load("human_gene_list.RData")   #human_genelist_bg
+    #load("human_factor_counts.RData")    #human_factor_counts
     
     ###creat or load your genelist of interest
-    #genelist <- c("GSTT1", "PLCE1", "XIST", "ENOSF-1", "AHR", "FSTL1", "YIPF5", "RBM5", "TNP01", "CREB1", "NOX4", "FLII")
+    genelist <- c("GSTT1", "PLCE1", "XIST", "ENOSF-1", "AHR", "FSTL1", "YIPF5", "RBM5", "TNP01", "CREB1", "NOX4", "FLII")
     
     ###get id for species 'human'
-    #taxon <-getTaxonURI("human")  #obo:NCBITaxon_9606
+    taxon <-getTaxonURI("human")  #obo:NCBITaxon_9606
     
     ###do enrichment
     #results <- doFishersEnrichmentForGeneNames(genelist, taxon, human_genelist_bg, human_factor_counts)

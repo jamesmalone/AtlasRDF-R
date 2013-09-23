@@ -29,5 +29,5 @@
 
 \examples{
     ####find the efo class uri for "asthma"
-    #getExFactorURIFromLabel("asthma")   #<http://www.ebi.ac.uk/efo/EFO_0000270>
+    getExFactorURIFromLabel("asthma")   #<http://www.ebi.ac.uk/efo/EFO_0000270>
 }

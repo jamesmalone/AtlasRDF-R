@@ -33,6 +33,6 @@ list of gene URIs matching the query: note this can be more than one
 
 \examples{
 ###get the gene URI identifier based on the common gene name for "SRGN" in human
-#getGeneUriFromName("SRGN", "obo:NCBITaxon_9606")
+getGeneUriFromName("SRGN", "obo:NCBITaxon_9606")
 }
 

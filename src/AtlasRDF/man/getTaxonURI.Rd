@@ -27,9 +27,10 @@ James Malone, Simon Jupp
 
 \examples{
 ###get URI for human
-#getTaxonURI("human")
+getTaxonURI("human")
+    
 ###or for arabidopsis
-#getTaxonURI("arabidopsis")
+getTaxonURI("arabidopsis")
 
 }
 

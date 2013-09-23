@@ -31,7 +31,7 @@ James Malone, Simon Jupp
 
 \examples{
 ###get the label for the class efo:EFO_0001185 (HeLa)
-#getLabel("efo:EFO_0001185")
+getLabel("efo:EFO_0001185")
 
 }
 

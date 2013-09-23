@@ -8,6 +8,7 @@
     Perform an enrichment of an input gene list using the Atlas as a background set for a specified species. The genes 
     are given as a set of ENSEMBL gene IDs (e.g. "ENSG00000188554"). The results are a list of experimental factors for 
     which these genes are enriched.
+    Access the backgroun data sets for enrichment from https://github.com/jamesmalone/AtlasRDF-R
 }
 \usage{
     doFishersEnrichmentForEnsemblIds(geneids, taxon, genelist_bg, genecounts)
@@ -56,15 +57,15 @@
     
     ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
     #load the background files for the species of interest (requires downloading)
-    #load("human_bg/human_gene_list.RData")   #human_genelist_bg
-    #load("human_bg/human_factor_counts.RData")    #human_factor_counts
+    #load("human_gene_list.RData")   #human_genelist_bg
+    #load("human_factor_counts.RData")    #human_factor_counts
     
     ###creat or load your genelist of interest
     genelist <- c("ENSG00000184674", "ENSG00000138193", "ENSG00000229807", "ENSG00000254279", "ENSG00000106546", 
             "ENSG00000163430", "ENSG00000118260", "ENSG00000086991")
     
     ###get id for species 'human'
-    #taxon <-getTaxonURI("human")  #obo:NCBITaxon_9606
+    taxon <-getTaxonURI("human")  #obo:NCBITaxon_9606
     
     ###do enrichment
     #results <- doFishersEnrichmentForEnsemblIds(genelist, taxon, human_genelist_bg, human_factor_counts)

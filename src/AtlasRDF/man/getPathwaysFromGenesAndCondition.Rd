@@ -35,7 +35,7 @@
 
 \examples{
     ###get pathways connected to genes which are differentially expressed for HeLa (efo:EFO_00011185)
-    #getPathwaysFromGenesAndCondition("efo:EFO_0001185")
+    getPathwaysFromGenesAndCondition("efo:EFO_0001185")
     
 }
 

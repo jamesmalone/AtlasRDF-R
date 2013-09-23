@@ -37,7 +37,7 @@ James Malone, Simon Jupp
 
 \examples{
 ###get experiments which contain the word liver in the description
-#getExperimentsByDescription("liver")
+getExperimentsByDescription("liver")
 
 }
 

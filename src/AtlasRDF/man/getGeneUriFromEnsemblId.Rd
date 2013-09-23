@@ -32,7 +32,7 @@ James Malone, Simon Jupp
 
 \examples{
 ###get the URI identifier for a gene based on the ENSEMBL ID
-#getGeneUriFromEnsemblId("ENSMUSG00000031314")
+getGeneUriFromEnsemblId("ENSMUSG00000031314")
 
 }
 

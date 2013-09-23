@@ -30,10 +30,7 @@ James Malone, Simon Jupp
 
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--    or do  help(data=index)  for the standard data sets.
-
-#getGeneListFromPubmedid("19668377")
+###get gene list for the publication with pubmed id 19668377
+getGeneListFromPubmedid("19668377")
 }
 

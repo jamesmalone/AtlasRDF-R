@@ -4,7 +4,8 @@
 Get all ENSEMBL genes reported as differentially expressed for a given experimental factor.
 }
 \description{
-Get all ENSEMBL genes reported as differentially expressed for a given experimental factor. Returns the gene URI, ENSEMBL Id and common gene name.
+Get all ENSEMBL genes reported as differentially expressed for a given experimental factor. 
+    Returns the gene URI, ENSEMBL Id and common gene name.
 }
 \usage{
 getAllEnsemblGenesForExFactor(exfactor, limit, endpoint)
@@ -35,6 +36,6 @@ James Malone, Simon Jupp
 
 \examples{
 ###get the genes for the experimental factor 'sepsis' (efo:EFO_0001420)
-#results <- getAllEnsemblGenesForExFactor("efo:EFO_0001420")
-#results[1,] #first gene result
+results <- getAllEnsemblGenesForExFactor("efo:EFO_0001420")
+results[1,] #first gene result
 }

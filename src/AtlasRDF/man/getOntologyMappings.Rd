@@ -33,6 +33,6 @@ James Malone, Simon Jupp
 
 \examples{
 ###find mappings in EFO from  <http://purl.bioontology.org/ontology/SNOMEDCT/87163000>  (leukemia in snomed)
-#getOntologyMappings("<http://purl.bioontology.org/ontology/SNOMEDCT/87163000>")
+getOntologyMappings("<http://purl.bioontology.org/ontology/SNOMEDCT/87163000>")
   
 }

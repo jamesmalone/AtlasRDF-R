@@ -1,39 +1,35 @@
 \name{calculateCountsForGeneLists}
 \alias{calculateCountsForGeneLists}
 \title{
-Internal function for counting genes in a gene list against the background
+    Internal function for counting genes in a gene list against the background
 }
 \description{
     Internal function for counting genes in a gene list against the background
 }
 \usage{
-calculateCountsForGeneLists(genelist, genelist_bg, genecounts)
+    calculateCountsForGeneLists(genelist, genelist_bg, genecounts)
 }
 
 \arguments{
-  \item{genelist}{
-%%     ~~Describe \code{genelist} here~~
-}
-  \item{genelist_bg}{
-%%     ~~Describe \code{genelist_bg} here~~
-}
-  \item{genecounts}{
-%%     ~~Describe \code{genecounts} here~~
-}
+    \item{genelist}{
+        Vector of gene uris which are being analysed for enrichment purposes and for which the factor-gene counts will be produced
+    }
+    \item{genelist_bg}{
+        Background list for species of interest
+    }
+    \item{genecounts}{
+        Factor counts for species of interest
+    }
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    returns a hash of factorbackground objects which contain information about which genes are diff expressed for a given factor
 }
 \author{
-James Malone, Simon Jupp
+    James Malone, Simon Jupp
 }
 
 \examples{
-
+    
 }
 \keyword{internal}
 

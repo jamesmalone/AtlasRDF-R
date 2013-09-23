@@ -5,7 +5,10 @@
     Perform a gene set enrichment using gene list based on common gene names. 
 }
 \description{
-    Perform an enrichment of an input gene list using the Atlas as a background set for a specified species. The genes are given as a set of common gene names (e.g. Brca1). The results are a list of experimental factors for which these genes are enriched.
+    Perform an enrichment of an input gene list using the Atlas as a background set for a specified species. 
+    The genes are given as a set of common gene names (e.g. Brca1). 
+    The results are a list of experimental factors for which these genes are enriched.
+    Access the backgroun data sets for enrichment from https://github.com/jamesmalone/AtlasRDF-R
 }
 \usage{
     doFishersEnrichmentForGeneNames(genenames, taxon, genelist_bg, genecounts, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql")
@@ -54,8 +57,8 @@
     
     ###perform gene set enrichment using Atlas as background to find factors genes are enriched for
     #load the background files for the species of interest (requires downloading)
-    #load("human/human_gene_list.RData")   #human_genelist_bg
-    #load("human/human_factor_counts.RData")    #human_factor_counts
+    #load("human_gene_list.RData")   #human_genelist_bg
+    #load("human_factor_counts.RData")    #human_factor_counts
     
     ###creat or load your genelist of interest
     genelist <- c("GSTT1", "PLCE1", "XIST", "ENOSF-1", "AHR", "FSTL1", "YIPF5", "RBM5", "TNP01", "CREB1", "NOX4", "FLII")
