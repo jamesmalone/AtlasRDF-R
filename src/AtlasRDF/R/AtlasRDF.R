@@ -500,6 +500,162 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
 }
 
 
+
+##########
+#getRankedPathwaysForGeneList - function to get pathways which are associated to a gene list, as ranked by pathways with most genes associated
+##########
+
+getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    #specify class to store enrichemt results 
+    pathwayresult <- setClass("pathwayresult",           
+            representation( pathwayuri="character", 
+                    label="character",    
+                    numgenes="numeric", 
+                    genes="vector"))
+    
+    rankedpathways <- list()
+    
+    
+    #loop through list
+    for (i in 1:length(genelist)){
+        
+        #get gene uri
+        geneuri <- getGeneUriFromEnsemblId(genelist[i])
+
+        if(length(geneuri) != 0){
+            
+            query <- paste("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+                    "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+                    "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+                    "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+                    "PREFIX sio: <http://semanticscience.org/resource/> \n",
+                    "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+                    "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+                    "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+                    "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
+                    
+                    
+                    "SELECT distinct ?pathway(str(?pathwayname) as ?pathname) \n",
+                    "WHERE { \n",
+                        
+                        # get Atlas experiment plus experimental factor where protein is expressed
+                        "?probe atlasterms:dbXref ", geneuri ," . \n",
+                        "?probe atlasterms:dbXref ?dbXref . \n",             
+                        
+                        # query for pathways by those protein targets
+                        "SERVICE <http://www.ebi.ac.uk/rdf/services/reactome/sparql> { \n",                            
+                            "?pathway rdf:type biopax3:Pathway .  \n",
+                            "?pathway ?p ?pathwayname . \n",
+                            "?pathway biopax3:pathwayComponent ?reaction . \n",
+                            "?reaction rdf:type biopax3:BiochemicalReaction . \n",
+                            "{ \n",         
+                                "{?reaction ?rel ?protein .} \n",  
+                                "UNION  \n",
+                                "{ \n", 
+                                    "?reaction  ?rel  ?complex . \n",
+                                    "?complex rdf:type biopax3:Complex . \n", 
+                                    "?complex ?comp ?protein . \n",
+                                    "}} \n", 
+                            "?protein rdf:type biopax3:Protein . \n",
+                            "?protein biopax3:memberPhysicalEntity \n",
+                            "[biopax3:entityReference ?dbXref ] . \n",
+                            "} \n",  
+                        
+                        "filter regex(str(?p), \"displayName\") . \n", 
+                        
+                        "} \n"
+                    )  #endpaste   
+            
+            pathways <- SPARQL(url=endpoint, query)           
+            result <- pathways$results
+            
+            foundpathway = FALSE
+            if(length(result) != 0){
+                #for each pathway returned
+                for(j in 1:length(result)){
+                    
+                    #if this isn't first time through the list, otherwise the list will be empty
+                    if(length(rankedpathways) !=0 ){
+                        
+                        #see if the pathway is already in list just add genes to it
+                        for(k in 1:length(rankedpathways)){
+                            
+                            if(result[1,j] == rankedpathways[[k]]@pathwayuri){
+                                #add genes to vector  
+                                vectorgenes <- rankedpathways[[k]]@genes
+                                vectorgenes <- c(vectorgenes, geneuri)
+                                rankedpathways[[k]]@genes <- vectorgenes
+                                rankedpathways[[k]]@numgenes <- length(vectorgenes)
+                                
+                                #since it exists break out of loop
+                                foundpathway = TRUE
+                                break
+                            }                                              
+                        }
+                        
+                    }    
+                    
+                    #if the pathway hasn't been found then add a new one
+                    if(foundpathway == FALSE){
+                        
+                        singlepathway <- new("pathwayresult")
+                        
+                        singlepathway@pathwayuri <- result[1,j]  #pathway uri
+                        singlepathway@label <- result[2,j]  #pathway name
+                        singlepathway@genes <- c(geneuri)  #gene for this pathway
+                        singlepathway@numgenes <- 1 # set gene count to 1
+                        rankedpathways <- c(rankedpathways, singlepathway)
+                    }
+                    
+                    
+                }
+                
+            }#end if 
+        }
+        
+        
+    }#end for loop sparql query    
+    
+    if(length(rankedpathways) > 1){
+        #mint a blank matrix
+        vec <- c(0,0)
+        matrixcounts <- matrix()
+        matrixcounts <- rbind(vec)
+        
+        #order results by pathway with most genes
+        for(i in 1:length(rankedpathways)){
+            
+            #extract out the gene counts
+            vec <- c(i, rankedpathways[[i]]@numgenes)
+            matrixcounts <- rbind(matrixcounts, vec)
+            
+        }
+        
+        #get rid of blank row at top
+        matrixcounts <- matrixcounts[-1,]
+        #order by gene counts
+        matrixcounts <- matrixcounts[order(matrixcounts[,2], decreasing=TRUE),]
+        
+        sortedpathways <- rankedpathways
+        #for each matrix count, reorder the pathway results with largest first
+        for(i in 1:nrow(matrixcounts)){
+            
+            sortedpathways[[i]] <- rankedpathways[[matrixcounts[i,1]]]             
+        }        
+    }
+    else {
+        sortedpathways <- rankedpathways    
+    }
+
+    return(sortedpathways)    
+}
+
+
+
 ###################
 #functions to perform enrichment analysis
 ###################
@@ -950,15 +1106,15 @@ doFishersEnrichmentForGeneNames <- function(genenames, taxon, genelist_bg, genec
 
 ###############
 #function to do enrichment analysis using Fisher's exact test based on a gene list specified by common gene name
-#input requires a vector of the common gene names and a taxon id e.g. obo:NCBITaxon_9606 for human (note genes from multiple species not allowed) 
+#input requires a vector of the common gene names
 ###############
-doFishersEnrichmentForEnsemblIds <- function(geneids, taxon, genelist_bg, genecounts){
+doFishersEnrichmentForEnsemblIds <- function(geneids, genelist_bg, genecounts){
     
     geneuris <- vector()
     
     for(i in 1:length(geneids)){
         
-        geneuris <- c(geneuris, getGeneUriFromEnsemblId(geneids[[i]], taxon))
+        geneuris <- c(geneuris, getGeneUriFromEnsemblId(geneids[[i]]))
     }
     
     #if none of these gens are found then do not go further
