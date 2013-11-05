@@ -1,0 +1,168 @@
+\documentclass[a4paper]{article}
+
+\title{AtlasRDF}
+\author{James Malone}
+
+\SweaveOpts{echo=FALSE}
+\usepackage{a4wide}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+The AtlasRDF package exposes the data stored in the Expression Atlas RDF store at the European Bioinformatics 
+Institute. This data concerns the reporting of genes which are differentially expressed under certain 
+experimental and biological conditions in certain species. These conditions - often called experimental factors -
+include diseases such as cancer, phenotypes such as obesity, cell types such as epithelial cells, organism part 
+such as brain and age. The data is also connected to other RDF stores such as proteins in UniProt and Pathways 
+in Reactome, all of which this packages uses to enrich the queries available. 
+
+
+Here we demonstrate how to use the Atlas to extract a gene list based on a condition of interest to  
+and to explore other data that may offer information about the condition and/or gene list using the AtlasRDF R package.
+
+The package is loaded using
+
+<<>>=
+library("AtlasRDF")
+@
+
+
+\section{Extracting a gene list}
+
+First of all we will find the appropriate ontology term to query the database with. AtlasRDF uses EFO
+<http:/www.ebi.ac.uk/efo> to annotate data with so we will find the appropriate EFO class URI for
+our search term which is type II diabetes.
+
+\SweaveOpts{echo=true}
+
+<<>>=
+
+termhits <- searchForEFOTerms("type II diabetes")
+
+print(termhits)
+@
+
+
+If you already use another ontology, we can also find an appropriate EFO term by using the term mappings 
+maintained by NCCBO Bioportal <http://bioportal.bioontology.org/> Here we do a simplel query of passing the 
+URI of the class you use (in this example the URI for type II diabetes from SNOMEDCT) to find any matching 
+terms in EFO, as mapped by BioPortal.
+
+<<>>=
+
+efomappings <- getOntologyMappings("<http://purl.bioontology.org/ontology/SNOMEDCT/44054006>")
+
+print(efomappings)
+@
+
+
+We select the class URI for type II diabetes called 'type II diabetes mellitus' and 
+extract get a gene list based on those genes differentially expressed in humans for 
+type II diabetes. First we get the URI for the species - human in this case. Then we 
+query for the genes for diabetes Type II.
+
+<<>>=
+humanURI <- getTaxonURI("human")
+
+typeIIgenelist <- getSpeciesSpecificEnsemblGenesForExFactor("<http://www.ebi.ac.uk/efo/EFO_0001360>", humanURI)
+
+head(typeIIgenelist)
+
+@
+
+
+
+\section{Refining the gene list}
+
+We now have a list of candidate genes of interest. We will now refine the list of approx 250 genes by finding genes 
+which share some common signalling pathways. The following block of code may take a little while to run.
+
+
+
+<<>>=
+#this will take a little while to run
+pathways <- getRankedPathwaysForGeneIds(typeIIgenelist[,3])
+head(pathways)
+@
+
+
+We can now see a list of pathways that these genes are connected to, with the most common pathway ranked as the 
+first element in the list. 
+
+<<>>=
+pathways[1]
+@
+
+
+Given this pathway, we can extract some further information. For instance, let us now find other experimental conditions
+that are connected to this pathway.
+First of all let's find other genes attached to this pathway.
+
+
+<<>>=
+genes <- getGenesForPathwayURI(pathways[[1]]@pathwayuri)
+
+@
+
+We can ask a few other questions about these genes. For instance, what other experimental factors
+are these genes differentially expressed for? We can use the Atlas enrichment functions to perform
+this task.
+
+Firstly, we need to download the human background data set. We require two background sets for each 
+species we wish to perform enrichment for, since these are human genes we will download the human
+backgrounds. These can be found at https://github.com/jamesmalone/AtlasRDF-R/tree/master/src/backgroundsetdata
+in the human subfolder you will find the two background data sets required.
+
+After downloading we need to load these files into our workspace.
+
+<<>>=
+#load("human/human_gene_list.RData") #human_genelist_bg
+#load("human/human_factor_counts.RData") #human_factor_counts
+@
+
+Finally do the enrichment, passing the gene list
+
+<<>>=
+###do enrichment
+#transcription_pathway_enrichment <- doFishersEnrichment(genes, human_genelist_bg, human_factor_counts)
+@
+
+If you don't have access to the enrichment background data sets, you can use the example 
+enrichment result set included. To load this data use the command:
+
+<<>>=
+data(transcription_pathway_enrichment)
+@
+
+You can now visualise these results in a graph.
+
+<<>>=
+vizgraph <- vizPvalues(transcription_pathway_enrichment, "0.00005")
+@
+
+There are a lot of resuts here, even with a low p-value threshold, so let's filter some types of 
+factors of interest. Let's look at just disease factors these genes are enriched for. The ontology
+class for disease is efo:EFO\_0000408 so let's include only subtypes of this class, i.e. diseases
+
+We can find the class in efo by using the search function since we will not usually know what the
+identifier of an EFO class is when we perform this filtering.
+
+<<>>=
+filteredgenes <- includeOnlySubclasses("efo:EFO_0000408", transcription_pathway_enrichment)
+@
+
+Though we still have quite a lot of results, even from this filter, so let's take the top 20 most 
+enriched experimental factors.
+
+<<>>=
+sortedset <- orderEnrichmentResults(filteredgenes)
+vizgraph <- vizPvalues(sortedset[1:20], 0.000001)
+@
+
+This points us to other factors that may be of interest to this pathway.
+
+
+\end{document}

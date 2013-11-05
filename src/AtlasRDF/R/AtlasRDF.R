@@ -26,8 +26,7 @@ getAllEnsemblGenesForExFactor <- function(exfactor, limit = 0, endpoint="http://
     
     
     
-    query <- paste( "#BioRDF-R query \n",
-            "#function: getAllEnsemblGenesForExFactor \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -55,7 +54,15 @@ getAllEnsemblGenesForExFactor <- function(exfactor, limit = 0, endpoint="http://
             limitC )
     
     message("Performing query please wait...")
-    res<-SPARQL(url=endpoint,query)
+    
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for ensembl genes ", err)
+            })#end tryCatch
+    
+    #res<-SPARQL(url=endpoint,query)
     return (res$results)    
 }
 
@@ -72,8 +79,7 @@ getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0
     else
     warning ("limit should be an integer, limit omitted from the query")
     
-    query <- paste( "#AtlasRDF-R query \n",
-            "#function: getSpeciesSpecificEnsemblGenesForExFactor \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -102,7 +108,14 @@ getSpeciesSpecificEnsemblGenesForExFactor <- function(exfactor, taxon, limit = 0
             limitC )
     
     message("Performing query please wait...")
-    res<-SPARQL(url=endpoint,query)
+    
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for species specific ensembl genes ", err)
+            })#end tryCatch
+
     return (res$results)    
 }
 
@@ -120,7 +133,7 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
     else
     warning ("limit should be an integer, limit omitted from the query")
     
-    query <- paste( "#AtlasRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -131,7 +144,7 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
             "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
             "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
             
-            "SELECT DISTINCT ?experiment ?description WHERE \n", 
+            "SELECT DISTINCT ?experiment WHERE \n", 
             "{?experiment a atlasterms:Experiment ; dcterms:description ?description ; \n", 
                 "atlasterms:hasAssay \n", 
                 "[atlasterms:hasSample \n", 
@@ -143,7 +156,13 @@ getExperimentsByDescription <- function(searchterm, limit = 0, endpoint = "http:
     
     message("Performing query please wait...")
 
-    res<-SPARQL(url=endpoint,query)
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for experiment by description ", err)
+            })#end tryCatch
+
     return (res$results)    
 }
 
@@ -155,7 +174,7 @@ getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk
     
     experimenturi <- paste("atlas:",experiment, sep="")
     
-    query <- paste( "#AtlasRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -181,7 +200,13 @@ getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk
     
     message("Performing query please wait...")
 
-    res<-SPARQL(url=endpoint,query)
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for genes for an experiment ID ", err)
+            })#end tryCatch
+    
     return (res$results)          
 }
 
@@ -192,7 +217,7 @@ getGenesForExperimentID <- function(experiment, endpoint = "http://www.ebi.ac.uk
 ########
 getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    query <- paste( "#AtlasRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -217,7 +242,14 @@ getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.u
             "}")
     
     message("Performing query please wait...")
-    res<-SPARQL(url=endpoint,query)
+    
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for genes for an experiment URI ", err)
+            })#end tryCatch
+    
     return (res$results)          
 }
 
@@ -228,7 +260,7 @@ getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.u
 getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){    
     ensemblid <- paste("identifiers:", geneid, sep="")
     
-    query <- paste( "#AtlasRDF-R query \n",    
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -256,7 +288,13 @@ getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/r
     
     
     
-    res<-SPARQL(url=endpoint,query)
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for experiment IDs by gene ID ", err)
+            })#end tryCatch
+    
     return (res$results)  
     
     
@@ -272,7 +310,7 @@ getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/r
 
 getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    query <- paste( "#AtlasRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -287,7 +325,14 @@ getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sp
                 uri,"rdfs:label ?label . \n",
                 "}")
     
-    res<-SPARQL(url=endpoint,query)
+    
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying getLabel query ", err)
+            })#end tryCatch
+    
     return (res$results)      
 }
 
@@ -298,7 +343,7 @@ getLabel <- function(uri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sp
 #########
 getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -337,6 +382,14 @@ getPathwaysFromGenesAndCondition <- function(condition, endpoint = "http://www.e
                 "} \n",
             "ORDER BY ASC (?pvalue) ")
     
+    
+    pathways <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying getPathwaysFromGenesAndConditions query ", err)
+            })#end tryCatch
+    
     pathways <- SPARQL(url=endpoint, query)
     return (pathways$results)
     
@@ -353,7 +406,7 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance = 5, n
     
     experiment <- paste("atlas:",experimentid, sep="")
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -379,7 +432,13 @@ drawHeatMapForAtlasExperiment <- function(experimentid, tstatsignificance = 5, n
                 "} ORDER BY ?genename limit 10000")
     
     message("Executing query... please wait")
-    d <- SPARQL(url=endpoint, query)
+    
+    d <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for drawHeatMapForAtlasExperiment function ", err)
+            })#end tryCatch
     
     df <- data.frame(Genename=d$results$genename, Factor=factor(d$results$factorLabel), TStat=d$results$tStat, stringsAsFactors=FALSE)
     attach(df)
@@ -433,7 +492,7 @@ getOntologyMappings <- function(searchuri, endpoint = "http://www.ebi.ac.uk/rdf/
     
     
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -455,8 +514,12 @@ getOntologyMappings <- function(searchuri, endpoint = "http://www.ebi.ac.uk/rdf/
                     " }\n",
                 "}", sep="")
     
-    efouri <- SPARQL(url=endpoint, query) 
-    
+    efouri <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getOntologyMappings function ", err)
+            })#end tryCatch
     
     return(efouri$results)   
 }
@@ -471,7 +534,7 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
             
     searchuri<- paste("<http://identifiers.org/pubmed/",searchid,">", sep="")
             
-    query <- paste( "#AtlasRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -490,7 +553,14 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
     
     message("Performing query please wait...")
 
-    res<-SPARQL(url=endpoint,query)
+    
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getGeneListFromPubmedid function ", err)
+            })#end tryCatch
+    
     message("Getting genes for experiment ", res$results[1])
 
     genelist <- getGenesForExperimentURI(res$results[1], endpoint)    
@@ -498,6 +568,154 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
     return(genelist)      
  
 }
+
+
+##########
+#get Reactome pathway for Ensembl gene id
+##########
+getGenesForPathwayURI <- function(pathwayuri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    
+    
+    query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
+            
+            
+            "SELECT distinct ?geneuri \n",
+            "WHERE { \n",
+                
+                
+                # query for pathways by those protein targets
+                "SERVICE <http://www.ebi.ac.uk/rdf/services/reactome/sparql> { \n",                            
+                    pathwayuri ,"rdf:type biopax3:Pathway .  \n",
+                    pathwayuri ,"biopax3:pathwayComponent ?reaction . \n",
+                    "?reaction rdf:type biopax3:BiochemicalReaction . \n",
+                    "{ \n",         
+                        "{?reaction ?rel ?protein .} \n",  
+                        "UNION  \n",
+                        "{ \n", 
+                            "?reaction  ?rel  ?complex . \n",
+                            "?complex rdf:type biopax3:Complex . \n", 
+                            "?complex ?comp ?protein . \n",
+                            "}} \n", 
+                    "?protein rdf:type biopax3:Protein . \n",
+                    "?protein biopax3:memberPhysicalEntity \n",
+                    "[biopax3:entityReference ?dbXref ] . \n",
+                    "} \n",   
+                
+                # get Atlas experiment plus experimental factor where protein is expressed
+
+                "?probe atlasterms:dbXref ?dbXref . \n",
+                "?probe atlasterms:dbXref ?geneuri . \n",
+                "?geneuri rdf:type atlasterms:EnsemblDatabaseReference . \n",
+              
+                               
+                "} \n"
+            )  #endpaste   
+
+    
+    genes <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getGenesForPathwayURI function ", err)
+            })#end tryCatch
+  
+    return(genes$results)   
+    
+}
+
+
+
+
+##########
+#get Reactome pathway for Ensembl gene id
+##########
+getPathwayForGeneId <- function(geneid,  endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+   
+    #get gene uri
+    geneuri <- getGeneUriFromEnsemblId(geneid)
+    
+    message(geneuri)
+    
+    if(length(geneuri) != 0){
+        
+        
+        query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+                "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+                "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+                "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+                "PREFIX sio: <http://semanticscience.org/resource/> \n",
+                "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+                "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+                "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+                "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+                "PREFIX biopax3:<http://www.biopax.org/release/biopax-level3.owl#> \n",
+                
+                
+                "SELECT distinct ?pathway(str(?pathwayname) as ?pathname) \n",
+                "WHERE { \n",
+                    
+                    # get Atlas experiment plus experimental factor where protein is expressed
+                    "?probe atlasterms:dbXref ", geneuri ," . \n",
+                    "?probe atlasterms:dbXref ?dbXref . \n",             
+                    
+                    # query for pathways by those protein targets
+                    "SERVICE <http://www.ebi.ac.uk/rdf/services/reactome/sparql> { \n",                            
+                        "?pathway rdf:type biopax3:Pathway .  \n",
+                        "?pathway ?p ?pathwayname . \n",
+                        "?pathway biopax3:pathwayComponent ?reaction . \n",
+                        "?reaction rdf:type biopax3:BiochemicalReaction . \n",
+                        "{ \n",         
+                            "{?reaction ?rel ?protein .} \n",  
+                            "UNION  \n",
+                            "{ \n", 
+                                "?reaction  ?rel  ?complex . \n",
+                                "?complex rdf:type biopax3:Complex . \n", 
+                                "?complex ?comp ?protein . \n",
+                                "}} \n", 
+                        "?protein rdf:type biopax3:Protein . \n",
+                        "?protein biopax3:memberPhysicalEntity \n",
+                        "[biopax3:entityReference ?dbXref ] . \n",
+                        "} \n",  
+                    
+                    "filter regex(str(?p), \"displayName\") . \n", 
+                    
+                    "} \n"
+                )  #endpaste   
+        
+        
+        
+        pathways <- tryCatch({
+                    SPARQL(url=endpoint,query)
+                },
+                error = function(err){
+                    message("An error occured when trying SPARQL query for getPathwayForGeneId function ", err)
+                })#end tryCatch
+        
+        return(pathways$results)
+        
+    }
+    else{
+        message("Could not find gene ", geneid)
+        
+    }
+    
+    
+}
+
 
 
 
@@ -508,12 +726,12 @@ getGeneListFromPubmedid <- function(searchid, endpoint = "http://www.ebi.ac.uk/r
 getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     
-    #specify class to store enrichemt results 
-    pathwayresult <- setClass("pathwayresult",           
-            representation( pathwayuri="character", 
-                    label="character",    
-                    numgenes="numeric", 
-                    genes="vector"))
+    #specify class to store enrichemt results - this is now in AllClasses.R
+    #pathwayresult <- setClass("pathwayresult",           
+     #       representation( pathwayuri="character", 
+      #              label="character",    
+       #             numgenes="numeric", 
+        #            genes="vector"))
     
     rankedpathways <- list()
     
@@ -523,10 +741,14 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
         
         #get gene uri
         geneuri <- getGeneUriFromEnsemblId(genelist[i])
-
+        
         if(length(geneuri) != 0){
             
-            query <- paste("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            message("querying ", geneuri)
+            
+            
+            query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+                    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
                     "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
                     "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
                     "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
@@ -569,14 +791,22 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
                         
                         "} \n"
                     )  #endpaste   
+
+           
+            pathways <- tryCatch({
+                        SPARQL(url=endpoint,query)
+                    },
+                    error = function(err){
+                        message("An error occured when trying SPARQL query for getRankedPathwaysForGeneIds function ", err)
+                    })#end tryCatch
+
             
-            pathways <- SPARQL(url=endpoint, query)           
             result <- pathways$results
             
             foundpathway = FALSE
             if(length(result) != 0){
                 #for each pathway returned
-                for(j in 1:length(result)){
+                for(j in 1:nrow(result)){
                     
                     #if this isn't first time through the list, otherwise the list will be empty
                     if(length(rankedpathways) !=0 ){
@@ -584,7 +814,8 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
                         #see if the pathway is already in list just add genes to it
                         for(k in 1:length(rankedpathways)){
                             
-                            if(result[1,j] == rankedpathways[[k]]@pathwayuri){
+                            if(result[j,1] == rankedpathways[[k]]@pathwayuri){
+                                
                                 #add genes to vector  
                                 vectorgenes <- rankedpathways[[k]]@genes
                                 vectorgenes <- c(vectorgenes, geneuri)
@@ -604,8 +835,8 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
                         
                         singlepathway <- new("pathwayresult")
                         
-                        singlepathway@pathwayuri <- result[1,j]  #pathway uri
-                        singlepathway@label <- result[2,j]  #pathway name
+                        singlepathway@pathwayuri <- result[j,1]  #pathway uri
+                        singlepathway@label <- result[j,2]  #pathway name
                         singlepathway@genes <- c(geneuri)  #gene for this pathway
                         singlepathway@numgenes <- 1 # set gene count to 1
                         rankedpathways <- c(rankedpathways, singlepathway)
@@ -650,10 +881,49 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
     else {
         sortedpathways <- rankedpathways    
     }
-
+    
     return(sortedpathways)    
 }
 
+
+
+###########
+#get efo URI based on label - exact match only
+###########
+searchForEFOTerms <- function(label, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?efouri ?label WHERE { \n",
+            "?efouri rdfs:subClassOf* efo:EFO_0000001 . \n",
+            "?efouri rdfs:label ?label . \n", 
+            "FILTER regex(str(?label), \"",label,"\", \"i\"). \n", 
+            "}", sep="")
+    
+    
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for searchForEFOTerms function ", err)
+            })#end tryCatch
+    
+    
+    uris <- SPARQL(url=endpoint, query)
+    return (uris$results)
+    
+    
+}
 
 
 ###################
@@ -666,7 +936,7 @@ getRankedPathwaysForGeneIds <- function(genelist, endpoint = "http://www.ebi.ac.
 ###########
 getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -685,15 +955,23 @@ getGeneUriFromName <- function(genename, taxon, endpoint = "http://www.ebi.ac.uk
                 "FILTER regex(str(?label), \"^",genename,"$\", \"i\"). \n", 
                 "}", sep="")
     
-    uris <- SPARQL(url=endpoint, query)
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getGeneUriFromName function ", err)
+            })#end tryCatch
+    
     return (uris$results)
     
 }
 
-
+###########
+#get efo URI based on label - exact match only
+###########
 getExFactorURIFromLabel <- function(label, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -710,11 +988,56 @@ getExFactorURIFromLabel <- function(label, endpoint = "http://www.ebi.ac.uk/rdf/
                 "?efouri rdfs:label ?label . \n", 
                 "FILTER regex(str(?label), \"^",label,"$\", \"i\"). \n", 
                 "}", sep="")
+
     
-    uris <- SPARQL(url=endpoint, query)
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getExFactorURIFromLabel function ", err)
+            })#end tryCatch
     return (uris$results)
     
+    
+    
 }
+
+
+###########
+#get efo URI based on label - exact match only
+###########
+searchForEFOTerms <- function(label, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
+    
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX obo: <http://purl.obolibrary.org/obo/> \n",
+            "PREFIX sio: <http://semanticscience.org/resource/> \n",
+            "PREFIX efo: <http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
+            
+            "SELECT distinct ?efouri ?label WHERE { \n",
+            "?efouri rdfs:subClassOf* efo:EFO_0000001 . \n",
+            "?efouri rdfs:label ?label . \n", 
+                "FILTER regex(str(?label), \"",label,"\", \"i\"). \n", 
+            "}", sep="")
+
+    
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for searchForEFOTerms function ", err)
+            })#end tryCatch
+    return (uris$results)
+    
+    
+}
+
 
 
 
@@ -725,7 +1048,7 @@ getGeneUriFromEnsemblId <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/ser
     
     
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -743,7 +1066,12 @@ getGeneUriFromEnsemblId <- function(id, endpoint = "http://www.ebi.ac.uk/rdf/ser
                 "FILTER regex(str(?geneid), \"",id,"\", \"i\"). \n", 
                 "}", sep="")
     
-    uris <- SPARQL(url=endpoint, query)
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getGeneUriFromEnsemblId function ", err)
+            })#end tryCatch
     return (uris$results)
     
 }
@@ -756,7 +1084,7 @@ getPathwayUriFromName <- function(name, endpoint = "http://www.ebi.ac.uk/rdf/ser
     
     
     
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -775,7 +1103,12 @@ getPathwayUriFromName <- function(name, endpoint = "http://www.ebi.ac.uk/rdf/ser
                 "FILTER regex(str(?label), \"",name,"\", \"i\"). \n", 
                 "}", sep="")
     
-    uris <- SPARQL(url=endpoint, query)
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for getPathwayUriFromName function ", err)
+            })#end tryCatch
     return (uris$results)
     
 }
@@ -1171,7 +1504,7 @@ vizPvalues <- function(resultset, cutoff = "0.05"){
 excludeSubclasses <- function(filterparentclass, resultset, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql"){
     
     #get the subclass uris for the class to filter out
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -1187,7 +1520,12 @@ excludeSubclasses <- function(filterparentclass, resultset, endpoint="http://www
             "?classuri rdfs:subClassOf*", filterparentclass,". \n",    
             "}")
     
-    uris <- SPARQL(url=endpoint, query)
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for excludeSubclasses function ", err)
+            })#end tryCatch
     
     sizeunfilitered <- length(resultset)     
     
@@ -1230,7 +1568,7 @@ includeOnlySubclasses <- function(includeparentclass, resultset, endpoint="http:
     filteredresults <- vector()
     
     #get the subclass uris for the class to filter out
-    query <- paste( "#BioRDF-R query \n",
+    query <- paste("PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n",
             "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
@@ -1243,35 +1581,47 @@ includeOnlySubclasses <- function(includeparentclass, resultset, endpoint="http:
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n",
             
             "SELECT distinct ?classuri WHERE { \n",           
-            "?classuri rdfs:subClassOf*", includeparentclass,". \n",    
-            "}")
-    
-    uris <- SPARQL(url=endpoint, query)
+                "?classuri rdfs:subClassOf*", includeparentclass,". \n",    
+                "}")
     
     
-    #create vector of uris in the result set
-    resulturis <- vector()
-    for(i in 1:length(resultset)){
-        resulturis <- c(resulturis, resultset[[i]]@factoruri)
-    }
+    uris <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("An error occured when trying SPARQL query for includeOnlySubclasses function ", err)
+            })#end tryCatch
     
-    #loop through each result and remove it if it exists in the results
-    for(i in 1:nrow(uris$results)){
+    #if subclasses were successfully retrieved from the sparql query
+    if(length(uris$results > 0)){
         
-        #if this is not null then there is a match
-        if(uris$results[i,] %in% resulturis){
+        #create vector of uris in the result set
+        resulturis <- vector()
+        for(i in 1:length(resultset)){
+            resulturis <- c(resulturis, resultset[[i]]@factoruri)
+        }
+        
+        #loop through each result and remove it if it exists in the results
+        for(i in 1:length(uris$results)){
             
-            
-            
-            #get element number but from filtered list as this will be different because it's being resized
-            includeelement <- match(uris$results[i,], resulturis)
-            #remove it from the list
-            filteredresults <- c(filteredresults,resultset[includeelement])         
-        }        
+            #if this is not null then there is a match
+            if(uris$results[i] %in% resulturis){
+                
+                #get element number but from filtered list as this will be different because it's being resized
+                includeelement <- match(uris$results[i], resulturis)
+                #remove it from the list
+                filteredresults <- c(filteredresults,resultset[includeelement])         
+            }        
+        }
+        message("Removed " ,(length(resulturis) - length(filteredresults))," factors from result set")    
+        
+        return (filteredresults)  
+        
     }
-    message("Removed " ,(length(resulturis) - length(filteredresults))," factors from result set")    
-    
-    return (filteredresults)   
+    #this may be because the sparql endpoint is down or the subclass given does not have any child classes
+    else{
+        message("Error in retrieving subclasses of class ", includeparentclass)
+    }
 }
 
 
@@ -1314,5 +1664,29 @@ getTaxonURI <- function(taxonName){
 }
 
 
+###########
+#order enrichment results set by p value
+###########
+orderEnrichmentResults <- function(resultset){
+    
+    sortedresultset <- list()
+    
+    resultpvalues <- data.frame(originalposition=character(), pvalue=character())
+    
+    #extract the pvlues from the result set
+    for(i in 1:length(resultset)){
+        newrow <- c(i, resultset[[i]]@p.value)
+        resultpvalues <- rbind(resultpvalues,newrow)
+    }
+
+    sortedpvalues <- resultpvalues[ order(resultpvalues[,2]),]  
+    
+    for(i in 1:nrow(sortedpvalues)){       
+        sortedresultset <- c(sortedresultset, resultset[[sortedpvalues[i,1]]])        
+    }
+   
+    return(sortedresultset)   
+    
+}
 
 

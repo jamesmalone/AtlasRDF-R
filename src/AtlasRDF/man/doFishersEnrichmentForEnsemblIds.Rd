@@ -11,14 +11,11 @@
     Access the backgroun data sets for enrichment from https://github.com/jamesmalone/AtlasRDF-R
 }
 \usage{
-    doFishersEnrichmentForEnsemblIds(geneids, taxon, genelist_bg, genecounts)
+    doFishersEnrichmentForEnsemblIds(geneids, genelist_bg, genecounts)
 }
 \arguments{
     \item{geneids}{
         Variable \code{geneids} a vector of genes using ENSEMBL gene IDs
-    }
-    \item{taxon}{
-        The \code{taxon} is an ontology URI which can be found using the function \code{getTaxonURI()}
     }
     \item{genelist_bg}{
         \code{genelist_bg} background list appropriate for the species of interest should be obtained from svn
