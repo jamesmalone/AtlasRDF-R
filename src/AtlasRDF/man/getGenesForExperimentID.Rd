@@ -34,7 +34,8 @@ James Malone, Simon Jupp
 
 \examples{
 ###get genes for experiment ID E-MEXP-3739
-res <- getGenesForExperimentID("E-MEXP-3739")
+#Can take several minutes to complete
+#res <- getGenesForExperimentID("E-MEXP-3739")
 ###list first gene in the experiment
-res[1,]
+#res[1,]
 }

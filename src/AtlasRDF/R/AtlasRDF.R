@@ -257,8 +257,8 @@ getGenesForExperimentURI <- function(experiment, endpoint = "http://www.ebi.ac.u
 ######
 #query for experiments that contain a specific ensembl gene ID and which is reported as diff expressed
 ######
-getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){    
-    ensemblid <- paste("identifiers:", geneid, sep="")
+getExperimentURIsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){    
+    ensembluri <- paste("identifiers:", geneid, sep="")
     
     query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
@@ -272,9 +272,9 @@ getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/r
             "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
             "PREFIX identifiers:<http://identifiers.org/ensembl/> \n",
             
-            "SELECT distinct ?expUri \n",
+            "SELECT distinct ?expURI \n",
             "WHERE { \n",            
-                "?expUri atlasterms:hasAnalysis ?analysis . \n",   
+                "?expURI atlasterms:hasAnalysis ?analysis . \n",   
                 "?analysis atlasterms:hasExpressionValue ?value . \n",      
                 "?value a ?diffExpType . \n",
                 "?diffExpType rdfs:subClassOf atlasterms:DifferentialExpressionRatio . \n",     
@@ -282,7 +282,7 @@ getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/r
                 "?value atlasterms:pValue ?pvalue . \n",      
                 "?value atlasterms:hasFactorValue ?factor . \n",      
                 "?value atlasterms:isMeasurementOf ?probe . \n",    
-                "?probe atlasterms:dbXref", ensemblid ,". \n",
+                "?probe atlasterms:dbXref", ensembluri ,". \n",
                 
                 "}")       
     
@@ -292,7 +292,52 @@ getExperimentIdsForGeneId <- function(geneid, endpoint = "http://www.ebi.ac.uk/r
                 SPARQL(url=endpoint,query)
             },
             error = function(err){
-                message("an error occured when trying to query for experiment IDs by gene ID ", err)
+                message("an error occured when trying to query for experiment URIs by gene ID ", err)
+            })#end tryCatch
+    
+    return (res$results)  
+    
+    
+}
+
+
+######
+#query for experiments that contain a specific ensembl gene ID and which is reported as diff expressed
+######
+getExperimentIdsForGeneURI <- function(geneuri, endpoint = "http://www.ebi.ac.uk/rdf/services/atlas/sparql"){    
+    
+    query <- paste( "PREFIX atlas_r: <http://atlasrdfrpackage> \n",
+            "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n",
+            "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> \n",
+            "PREFIX dcterms: <http://purl.org/dc/terms/> \n",
+            "PREFIX efo:<http://www.ebi.ac.uk/efo/> \n",
+            "PREFIX obo:<http://purl.obolibrary.org/obo/> \n",
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n",
+            "PREFIX sio:<http://semanticscience.org/resource/> \n",
+            "PREFIX atlas: <http://rdf.ebi.ac.uk/resource/atlas/> \n",
+            "PREFIX atlasterms: <http://rdf.ebi.ac.uk/terms/atlas/> \n",
+            "PREFIX identifiers:<http://identifiers.org/ensembl/> \n",
+            
+            "SELECT distinct ?experimentid \n",
+            "WHERE { \n", 
+            "?expUri dcterms:identifier ?experimentid . \n",          
+            "?expUri atlasterms:hasAnalysis ?analysis . \n",   
+            "?analysis atlasterms:hasExpressionValue ?value . \n",      
+            "?value a ?diffExpType . \n",
+            "?diffExpType rdfs:subClassOf atlasterms:DifferentialExpressionRatio . \n",     
+            "?value rdfs:label ?expressionValue . \n",     
+            "?value atlasterms:pValue ?pvalue . \n",      
+            "?value atlasterms:hasFactorValue ?factor . \n",      
+            "?value atlasterms:isMeasurementOf ?probe . \n",    
+            "?probe atlasterms:dbXref", geneuri ,". \n",
+            
+            "}")       
+  
+    res <- tryCatch({
+                SPARQL(url=endpoint,query)
+            },
+            error = function(err){
+                message("an error occured when trying to query for experiment IDs by gene URI ", err)
             })#end tryCatch
     
     return (res$results)  

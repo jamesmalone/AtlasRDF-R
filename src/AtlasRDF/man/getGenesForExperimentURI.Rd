@@ -34,8 +34,8 @@ James Malone, Simon Jupp
 
 \examples{
 ###get genes for experiment <http://rdf.ebi.ac.uk/resource/atlas/E-GEOD-13396>
-
-res <- getGenesForExperimentURI("<http://rdf.ebi.ac.uk/resource/atlas/E-MEXP-3739>")
+#Can take several minutes to complete
+#res <- getGenesForExperimentURI("<http://rdf.ebi.ac.uk/resource/atlas/E-MEXP-3739>")
 ###list first gene in the experiment
-res[1,]
+#res[1,]
 }

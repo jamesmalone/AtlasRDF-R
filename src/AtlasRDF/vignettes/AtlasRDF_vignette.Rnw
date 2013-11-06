@@ -75,7 +75,7 @@ head(typeIIgenelist)
 
 
 
-\section{Refining the gene list}
+\section{Extracting pathways from genes}
 
 We now have a list of candidate genes of interest. We will now refine the list of approx 250 genes by finding genes 
 which share some common signalling pathways. The following block of code may take a little while to run.
@@ -83,9 +83,10 @@ which share some common signalling pathways. The following block of code may tak
 
 
 <<>>=
-#this will take a little while to run
-pathways <- getRankedPathwaysForGeneIds(typeIIgenelist[,3])
-head(pathways)
+#this will take a little while to run so we comment out for the vignette
+#pathways <- getRankedPathwaysForGeneIds(typeIIgenelist[,3])
+#head(pathways)
+
 @
 
 
@@ -93,19 +94,25 @@ We can now see a list of pathways that these genes are connected to, with the mo
 first element in the list. 
 
 <<>>=
-pathways[1]
+#pathways[1]
 @
 
+\section{Finding related conditions}
 
 Given this pathway, we can extract some further information. For instance, let us now find other experimental conditions
 that are connected to this pathway.
-First of all let's find other genes attached to this pathway.
+First of all let's find other genes attached to this pathway. 
 
 
 <<>>=
-genes <- getGenesForPathwayURI(pathways[[1]]@pathwayuri)
+#if you have run the previous steps you can extract the pathway uri from the pathways list using
+#pathways[[1]]@pathwayuri
+#for convenience we will name the pathway
+genes <- getGenesForPathwayURI("<http://identifiers.org/reactome/REACT_12627.3>")
 
 @
+
+\section{Gene set enrichment with Expression Atlas}
 
 We can ask a few other questions about these genes. For instance, what other experimental factors
 are these genes differentially expressed for? We can use the Atlas enrichment functions to perform
@@ -162,7 +169,36 @@ sortedset <- orderEnrichmentResults(filteredgenes)
 vizgraph <- vizPvalues(sortedset[1:20], 0.000001)
 @
 
-This points us to other factors that may be of interest to this pathway.
+This points us to other factors that may be of interest to this pathway. In addition we can explore the genes enriched 
+for these particular factors. If we look at the top enriched factor we can see the gene list for it.
+
+<<>>=
+sortedset[1]
+@
+
+\section{Getting raw data from ArrayExpress R}
+
+We could follow this up by extracting data from ArrayExpress for these genes using the ArrayExpress R package. 
+To extract the experiment IDs we can use the function getExperimentIdsForGeneURI which will return a list of
+ArrayExpress experiment IDs which can be used with the ArrayExpress R package to obtain the source data files.
+
+
+<<>>=
+#get experiments for first enriched gene
+experiments <- getExperimentIdsForGeneURI(sortedset[[1]]@enrichedgenes[1])
+#look at first 5 experiment IDs
+experiments[1:5]
+@
+
+\section{Useful links}
+
+The ArrayExpress R package is available from http://www.bioconductor.org/packages/release/bioc/html/ArrayExpress.html
+
+Gene Expression Atlas is available at http://www.ebi.ac.uk/gxa
+
+The RDFAtlas is available at http://www.ebi.ac.uk/rdf/services/atlas/
+
+EFO, the ontology which is used to describe experimental factors, is available at http://www.ebi.ac.uk/efo
 
 
 \end{document}
