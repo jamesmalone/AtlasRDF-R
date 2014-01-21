@@ -2,7 +2,7 @@
 
 
 #class to store information about a pathway and associated genes
-pathwayresult <- setClass("pathwayresult",           
+setClass("pathwayresult",           
         representation( pathwayuri="character", 
                 label="character",    
                 numgenes="numeric", 
@@ -10,7 +10,7 @@ pathwayresult <- setClass("pathwayresult",
 
 
 
-#class used to store gene references, uncluding the URI, name, ID, species and experimental factors associated with the gene
+#class used to store gene references, including the URI, name, ID, species and experimental factors associated with the gene
 generef <- setRefClass("generef",
         fields = list( geneuri = "character",
                 genelabel = "character",
@@ -49,6 +49,16 @@ generef <- setRefClass("generef",
                 },  
                 getexfactoruris = function() {
                     return(exfactoruris)
+                }, 
+                show = function() {
+                    message("An object of class generef used to store gene reference objects")
+                    message("Field values")
+                    message("geneuri: ", geneuri) 
+                    message("genelabel: ", genelabel)
+                    message("geneensemblid: ", geneensemblid)
+                    message("species: ", species)
+                    message("exfactoruris (URI identifiers for experimental factors associated with this gene): ", exfactoruris)
+                   
                 },   
                 #function to merge a passed parameter with the existing set of genes stored in this object
                 mergeexfactoruris = function(value){
@@ -144,6 +154,18 @@ factorbackground <- setRefClass("factorbackground",
                 getsuperclasses = function() {
                     return(superclasses)
                 },
+                show = function() {
+                    message("An object of class factorbackground used to store an experimental factor and any gene associated with them")
+                    message("Field values")
+                    message("uri (identifier for the factor): ", uri) 
+                    message("label (human readable label for the factor): ", label) 
+                    message("species (the species of the genes associated with the factor): ", species) 
+                    message("geneuris (the URI identifiers of the genes associated with the factor): ", geneuris) 
+                    message("numgenesexpressed (the total number of genes differetially expressed and associated with the factor): ", numgenesexpressed)
+                    message("numgenesnotexpressed (the total number of genes not differetially expressed and associated with the factor): ", numgenesnotexpressed)  
+                    message("subclasses (ontology subclasses for this factor): ", subclasses) 
+                    message("superclasses (ontology superclasses for this factor): ", superclasses) 
+                }, 
                 
                 #function to merge a passed parameter with the existing set of genes stored in this object
                 mergegeneuris = function(value){
@@ -158,7 +180,7 @@ factorbackground <- setRefClass("factorbackground",
 
 #class to store enrichemt results, including the uri of the factor plus information on the statistics for enrichment
 #such as p.value and the genes enriched for this factor
-enrichmentresult <- setClass("enrichmentresult",           
+setClass("enrichmentresult",           
         representation( factoruri="character", 
                 label="character", 
                 p.value="numeric", 
