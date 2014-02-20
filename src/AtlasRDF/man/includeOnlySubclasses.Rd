@@ -32,7 +32,7 @@
 
 \examples{
     ###include only experimental factors which are diseases in the enrichment results
-    #filteredgenes <- includeOnlySubclasses("efo:EFO_0000408", mouseresults, endpoint="http://wwwdev.ebi.ac.uk/rdf/services/atlas/sparql")
+    #filteredgenes <- includeOnlySubclasses("efo:EFO_0000408", mouseresults, endpoint="http://www.ebi.ac.uk/rdf/services/atlas/sparql")
     ###view results
     #vizPvalues(filteredgenes)      
 }

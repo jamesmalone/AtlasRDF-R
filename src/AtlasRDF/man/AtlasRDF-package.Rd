@@ -41,7 +41,7 @@
     Maintainer: James Malone <malone@ebi.ac.uk>
 }
 \references{
-    Gene Expression Atlas RDF - http://wwwdev.ebi.ac.uk/rdf/services/atlas/
+    Gene Expression Atlas RDF - http://www.ebi.ac.uk/rdf/services/atlas/
     Gene Expression Atlas - http://www.ebi.ac.uk/gxa
     Experimental Factor Ontology - http://www.ebi.ac.uk/efo
     Kapushesky M, Adamusiak T, Burdett T, Culhane A, Farne A, Filippov A, Holloway E, Klebanov A, Kryvych N, Kurbatova N, Kurnosov P, Malone J, Melnichuk O, Petryszak R, Pultsin N, Rustici G, Tikhonov A, Travillian RS, Williams E, Zorin A, Parkinson H, Brazma A. (2012) Gene Expression Atlas update--a value-added database of microarray and sequencing-based functional genomics experiments. Nucleic Acids Res. 2012 Jan;40(Database issue):D1077-81.
